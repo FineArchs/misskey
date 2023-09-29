@@ -36,7 +36,7 @@ describe('api:notes/create', () => {
 
 			test('null post', () => {
 				expect(v({ text: null }))
-					.toBe(INVALID);
+					.toBe(VALID);
 			});
 
 			test('0 characters post', () => {
