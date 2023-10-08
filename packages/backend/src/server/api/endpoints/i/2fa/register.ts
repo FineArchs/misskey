@@ -60,7 +60,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				try {
 					await this.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (e) {
-					throw new Error('authentication failed. (' + e.message + ')');
+					throw new Error('authentication failed. (' + (e as Error).message + ')');
 				}
 			}
 
