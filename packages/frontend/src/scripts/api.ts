@@ -53,12 +53,12 @@ export function api<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoin
 
 export async function apiExternal<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoints[E]['req']>(host: string, endpoint: E, data: P = {} as any, token?: string | null | undefined, signal?: AbortSignal): Promise<Misskey.Endpoints[E]['res']> {
 	if (endpoint.includes('://')) throw new Error('invalid endpoint');
-	const [ hostName, hostUrl ] = await (new Promise(resolve => resolve(URL(host))))
+	const [hostName, hostUrl] = await (new Promise(resolve => resolve(URL(host))))
 		.then(url => {
-			if (['http:', 'https:'].includes(url.protocol)) return [ url.host, host ];
+			if (['http:', 'https:'].includes(url.protocol)) return [url.host, host];
 			else throw new Error('Only http and https are allowed as url protocol.');
 		}, err => {
-			if (err instanceof TypeError) return [ host, 'https://' + host ];
+			if (err instanceof TypeError) return [host, 'https://' + host];
 			else throw err;
 		});
 	const serverInfo = await api('federation/show-instance', { host: hostName });
