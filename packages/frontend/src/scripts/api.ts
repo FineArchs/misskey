@@ -64,18 +64,13 @@ export async function apiExternal<E extends keyof Misskey.Endpoints, P extends M
 	const serverInfo = await api('federation/show-instance', { host: hostName });
 	if ((!serverInfo) || serverInfo.isBlocked) throw new Error(hostName + 'is blocked by or not known to this server.');
 
-	pendingApiRequestsCount.value++;
-	const onFinally = () => {
-		pendingApiRequestsCount.value--;
-	};
-
-	const promise = new Promise<Misskey.Endpoints[E]['res'] | void>((resolve, reject) => {
-		// Append a credential
-		(data as any).i = token;
-
+	const sendReq = (endp: string) => new Promise<Misskey.Endpoints[E]['res'] | void>((resolve, reject) => {
+		pendingApiRequestsCount.value++;
+		const onFinally = () => {
+			pendingApiRequestsCount.value--;
+		};
 		const fullUrl = (hostUrl.slice(-1) === '/' ? hostUrl.slice(0, -1) : hostUrl)
-				+ '/api/' + (endpoint.slice(0, 1) === '/' ? endpoint.slice(1) : endpoint);
-		// Send request
+				+ '/api/' + (endp.slice(0, 1) === '/' ? endp.slice(1) : endp);
 		window.fetch(fullUrl, {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -95,12 +90,17 @@ export async function apiExternal<E extends keyof Misskey.Endpoints, P extends M
 			} else {
 				reject(body.error);
 			}
-		}).catch(reject);
+		}).catch(reject).then(onFinally, onFinally);
 	});
 
-	promise.then(onFinally, onFinally);
-
-	return promise;
+	// misskeyであるかの確認
+	return sendReq('federation/show-instance')
+		.then(res => {
+			if ((!serverInfo) || serverInfo.isBlocked) throw new Error(hostName + 'is blocking or does not know this server.');
+			else return sendReq(endpoint);
+		}, err => {
+			throw new Error(hostName + 'might not be responding or not a misskey server.');
+		});
 }
 
 // Implements Misskey.api.ApiClient.request
