@@ -284,7 +284,7 @@ export default function(props: MfmProps) {
 					}
 					case 'onclick': {
 						return h('span', {
-							onClick: () => onClick.get(token.props.args.id || '')?.(),
+							onClick: () => props.onClick.get(token.props.args.id || '')?.(),
 						}, genEl(token.children, scale));
 					}
 				}
@@ -439,6 +439,6 @@ export default function(props: MfmProps) {
 	return h('span', {
 		// https://codeday.me/jp/qa/20190424/690106.html
 		style: props.nowrap ? 'white-space: pre; word-wrap: normal; overflow: hidden; text-overflow: ellipsis;' : 'white-space: pre-wrap;',
-		onClick: () => onClick.get(null)?.(),
+		onClick: () => props.onClick.get(null)?.(),
 	}, genEl(rootAst, props.rootScale ?? 1));
 }
