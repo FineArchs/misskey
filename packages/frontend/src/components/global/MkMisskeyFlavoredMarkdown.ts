@@ -41,7 +41,7 @@ type MfmProps = {
 	parsedNodes?: mfm.MfmNode[] | null;
 	enableEmojiMenu?: boolean;
 	enableEmojiMenuReaction?: boolean;
-	onClicks?:  Map<string | null, () => void>;
+	onClicks?: Map<string | null, () => void>;
 };
 
 // eslint-disable-next-line import/no-default-export
