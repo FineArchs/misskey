@@ -46,6 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:initialCw="c.form.cw"
 		/>
 	</div>
+	<MkNote v-else-if="c.type === 'note'" :note="c.note"/>
 	<MkFolder v-else-if="c.type === 'folder'" :defaultOpen="c.opened">
 		<template #label>{{ c.title }}</template>
 		<template v-for="child in c.children" :key="child">
@@ -71,6 +72,7 @@ import MkSelect from '@/components/MkSelect.vue';
 import { AsUiComponent } from '@/scripts/aiscript/ui.js';
 import MkFolder from '@/components/MkFolder.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
+import MkNote from '@/components/MkNote.vue';
 
 const props = withDefaults(defineProps<{
 	component: AsUiComponent;
