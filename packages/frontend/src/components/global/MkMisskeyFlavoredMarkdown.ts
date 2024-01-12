@@ -225,7 +225,9 @@ export default function(props: MfmProps, context: SetupContext<MfmEvents>) {
 						if (!defaultStore.state.advancedMfm) break;
 						const x = parseFloat(token.props.args.x ?? '0');
 						const y = parseFloat(token.props.args.y ?? '0');
-						style = `transform: translateX(${x}em) translateY(${y}em);`;
+						style = token.props.args.absolute
+							? `position:absolute; top: ${x}em; left: ${y}em;`;
+							: `transform: translateX(${x}em) translateY(${y}em);`;
 						break;
 					}
 					case 'scale': {
