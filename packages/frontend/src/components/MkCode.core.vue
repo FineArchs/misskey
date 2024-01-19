@@ -54,7 +54,7 @@ watch([() => props.code, () => props.lang], ([code, lang]) => {
 			theme: 'dark-plus',
 		});
 	})();
-});
+}, { immediate: true });
 </script>
 
 <style scoped lang="scss">
