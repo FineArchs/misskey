@@ -25,6 +25,7 @@ const html = ref<string | null>(null);
 
 // setupの中でawaitするとロードが遅延されそう（多分）なのでasync関数内で実行
 if (props.lang !== undefined) (async () => {
+	throw 'hoge';
 	const highlighter = await getHighlighter();
 	const codeLang = await fetchLanguage(highlighter, props.lang);
 	if (codeLang === null) return;
