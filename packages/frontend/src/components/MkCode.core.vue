@@ -32,7 +32,7 @@ if (props.lang !== undefined) (async () => {
 		lang: codeLang.value,
 		theme: 'dark-plus',
 	});
-})();
+})().catch(err => html.value=`${err}`);
 
 // Check for the loaded languages
 function isLoaded(highlighter: Highlighter, langName: string): langName is ShikiLang {
