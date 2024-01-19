@@ -27,10 +27,9 @@ const html = ref<string | null>(null);
 if (props.lang !== undefined) (async () => {
 	const highlighter = await getHighlighter();
 	const codeLang = await fetchLanguage(highlighter, props.lang);
-	throw codeLang;
 	if (codeLang === null) return;
 	html.value = highlighter.codeToHtml(props.code, {
-		lang: codeLang.value,
+		lang: codeLang,
 		theme: 'dark-plus',
 	});
 })().catch(err => html.value=`${err}`);
