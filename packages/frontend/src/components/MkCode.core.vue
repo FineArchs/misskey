@@ -5,13 +5,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <!-- eslint-disable vue/no-v-html -->
 <template>
-<div :class="['codeBlockRoot', { 'codeEditor': codeEditor }]" v-html="html"></div>
+<div v-if="html" :class="['codeBlockRoot', { 'codeEditor': codeEditor }]" v-html="html"></div>
+<pre v-else :class="['codeBlockFallbackRoot', { 'codeEditor': codeEditor }]"><code>{{ code }}</code></pre>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { BUNDLED_LANGUAGES } from 'shiki';
-import type { Lang as ShikiLang } from 'shiki';
+import type { Highlighter, Lang as ShikiLang } from 'shiki';
 import { getHighlighter } from '@/scripts/code-highlighter.js';
 
 const props = defineProps<{
@@ -20,45 +21,45 @@ const props = defineProps<{
 	codeEditor?: boolean;
 }>();
 
-const highlighter = await getHighlighter();
+const html = ref<string | null>(null);
 
-const codeLang = ref<ShikiLang | 'aiscript'>('js');
-const html = computed(() => highlighter.codeToHtml(props.code, {
-	lang: codeLang.value,
-	theme: 'dark-plus',
-}));
-
-async function fetchLanguage(to: string): Promise<void> {
-	const language = to as ShikiLang;
-
-	// Check for the loaded languages, and load the language if it's not loaded yet.
-	if (!highlighter.getLoadedLanguages().includes(language)) {
-		// Check if the language is supported by Shiki
-		const bundles = BUNDLED_LANGUAGES.filter((bundle) => {
-			// Languages are specified by their id, they can also have aliases (i. e. "js" and "javascript")
-			return bundle.id === language || bundle.aliases?.includes(language);
-		});
-		if (bundles.length > 0) {
-			await highlighter.loadLanguage(language);
-			codeLang.value = language;
-		} else {
-			codeLang.value = 'js';
-		}
-	} else {
-		codeLang.value = language;
-	}
+// Check for the loaded languages
+function isLoaded(highlighter: Highlighter, langName: string): langName is ShikiLang {
+	return highlighter.getLoadedLanguages().includes(langName);
+}
+// Check if the language is supported by Shiki
+function isBundled(langName: string): langName is ShikiLang {
+	return BUNDLED_LANGUAGES.some(bundle => {
+		// Languages are specified by their id, they can also have aliases (i. e. "js" and "javascript")
+		return bundle.id === langName || bundle.aliases?.includes(langName);
+	});
 }
 
-watch(() => props.lang, (to) => {
-	if (codeLang.value === to || !to) return;
-	return new Promise((resolve) => {
-		fetchLanguage(to).then(() => resolve);
-	});
+async function fetchLanguage(highlighter: Highlighter, langName: string): Promise<ShikiLang | null> {
+	if (isLoaded(highlighter, langName)) return langName;
+	else if (isBundled(langName)) {
+		await highlighter.loadLanguage(langName);
+		return langName;
+	}
+	else return null;
+}
+
+watch([() => props.code, () => props.lang], ([code, lang]) => {
+	if (lang !== undefined) (async () => {
+		const highlighter = await getHighlighter();
+		const codeLang = await fetchLanguage(highlighter, lang);
+		if (codeLang === null) return;
+		html.value = highlighter.codeToHtml(code, {
+			lang: codeLang,
+			theme: 'dark-plus',
+		});
+	})();
 }, { immediate: true });
 </script>
 
 <style scoped lang="scss">
-.codeBlockRoot :deep(.shiki) {
+.codeBlockRoot :deep(.shiki),
+.codeBlockFallbackRoot {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;
@@ -70,11 +71,18 @@ watch(() => props.lang, (to) => {
 	}
 }
 
-.codeBlockRoot.codeEditor {
+.codeBlockFallbackRoot {
+	display: block;
+	color: #D4D4D4;
+	background: #1E1E1E;
+}
+
+.codeEditor {
 	min-width: 100%;
 	height: 100%;
 
-	& :deep(.shiki) {
+	& :deep(.shiki),
+	&.codeBlockFallbackRoot {
 		padding: 12px;
 		margin: 0;
 		border-radius: 6px;
