@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { BUNDLED_LANGUAGES } from 'shiki';
 import type { Highlighter, Lang as ShikiLang } from 'shiki';
 import { getHighlighter } from '@/scripts/code-highlighter.js';
@@ -22,17 +22,6 @@ const props = defineProps<{
 }>();
 
 const html = ref<string | null>(null);
-
-// setupの中でawaitするとロードが遅延されそう（多分）なのでasync関数内で実行
-if (props.lang !== undefined) (async () => {
-	const highlighter = await getHighlighter();
-	const codeLang = await fetchLanguage(highlighter, props.lang);
-	if (codeLang === null) return;
-	html.value = highlighter.codeToHtml(props.code, {
-		lang: codeLang,
-		theme: 'dark-plus',
-	});
-})().catch(err => html.value=`${err}`);
 
 // Check for the loaded languages
 function isLoaded(highlighter: Highlighter, langName: string): langName is ShikiLang {
@@ -54,6 +43,18 @@ async function fetchLanguage(highlighter: Highlighter, langName: string): Promis
 	}
 	else return null;
 }
+
+watch([() => props.code, () => props.lang], ([code, lang]) => {
+	if (lang !== undefined) (async () => {
+		const highlighter = await getHighlighter();
+		const codeLang = await fetchLanguage(highlighter, lang);
+		if (codeLang === null) return;
+		html.value = highlighter.codeToHtml(code, {
+			lang: codeLang,
+			theme: 'dark-plus',
+		});
+	})();
+});
 </script>
 
 <style scoped lang="scss">
