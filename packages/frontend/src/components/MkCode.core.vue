@@ -23,15 +23,16 @@ const props = defineProps<{
 
 const html = ref<string | null>(null);
 
-if (props.lang !== undefined) getHighlighter()
-	.then(highlighter => {
-		const codeLang = await fetchLanguage(props.lang);
-		if (codeLang === null) return;
-		html.value = highlighter.codeToHtml(props.code, {
-			lang: codeLang.value,
-			theme: 'dark-plus',
-		});
+// setupの中でawaitするとロードが遅延されそう（多分）なのでasync関数内で実行
+if (props.lang !== undefined) (async () => {
+	const highlighter = await getHighlighter();
+	const codeLang = await fetchLanguage(highlighter, props.lang);
+	if (codeLang === null) return;
+	html.value = highlighter.codeToHtml(props.code, {
+		lang: codeLang.value,
+		theme: 'dark-plus',
 	});
+})();
 
 // Check for the loaded languages
 function isLoaded(highlighter: Highlighter, langName: string): langName is ShikiLang {
