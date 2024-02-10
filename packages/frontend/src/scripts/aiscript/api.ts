@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as mfm from 'mfm-js';
 import { utils, values } from '@syuilo/aiscript';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
@@ -88,6 +89,10 @@ export function createAiScriptEnv(opts) {
 		'Mk:nyaize': values.FN_NATIVE(([text]) => {
 			utils.assertString(text);
 			return values.STR(nyaize(text.value));
+		}),
+		'Mfm:parse': values.FN_NATIVE(([text]) => {
+			utils.assertString(text);
+			return utils.jsToVal(mfm.parse(text.value));
 		}),
 	};
 }
