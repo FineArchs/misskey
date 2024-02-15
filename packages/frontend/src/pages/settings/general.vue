@@ -65,6 +65,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<option value="large">{{ i18n.ts.large }}</option>
 				</MkRadios>
 				<MkSwitch v-model="limitWidthOfReaction">{{ i18n.ts.limitWidthOfReaction }}</MkSwitch>
+				<MkRadios v-model="noteCollapsingLength">
+					<template #label>{{ i18n.ts.noteCollapsingLength }}</template>
+					<option value="short">{{ i18n.ts.short }}</option>
+					<option value="medium">{{ i18n.ts.mediumLength }}</option>
+					<option value="long">{{ i18n.ts.long }}</option>
+				</MkRadios>
 			</div>
 
 			<MkSelect v-model="instanceTicker">
@@ -306,6 +312,7 @@ const disableStreamingTimeline = computed(defaultStore.makeGetterSetter('disable
 const useGroupedNotifications = computed(defaultStore.makeGetterSetter('useGroupedNotifications'));
 const enableSeasonalScreenEffect = computed(defaultStore.makeGetterSetter('enableSeasonalScreenEffect'));
 const enableHorizontalSwipe = computed(defaultStore.makeGetterSetter('enableHorizontalSwipe'));
+const noteCollapsingLength = computed(defaultStore.makeGetterSetter('noteCollapsingLength'));
 
 watch(lang, () => {
 	miLocalStorage.setItem('lang', lang.value as string);
