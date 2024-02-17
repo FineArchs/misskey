@@ -367,7 +367,6 @@ const props = defineProps<{
 }>();
 
 const flash = ref<Misskey.entities.Flash | null>(null);
-const visibility = ref<Misskey.entities.FlashUpdateRequest['visibility']>('public');
 
 if (props.id) {
 	flash.value = await misskeyApi('flash/show', {
@@ -379,6 +378,7 @@ const title = ref(flash.value?.title ?? 'New Play');
 const summary = ref(flash.value?.summary ?? '');
 const permissions = ref(flash.value?.permissions ?? []);
 const script = ref(flash.value?.script ?? PRESET_DEFAULT);
+const visibility = ref(flash.value?.visibility ?? 'public');
 
 function selectPreset(ev: MouseEvent) {
 	os.popupMenu([{
