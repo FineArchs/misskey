@@ -73,7 +73,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				updatedAt: new Date(),
 				...Object.fromEntries(
 					Object.entries(ps).filter(
-						v => (v !== 'flashId') && paramDef.properties.hasOwnProperty(v[0])
+						([key, val]) => (key !== 'flashId') && paramDef.properties.hasOwnProperty(key)
 					)
 				),
 			});
