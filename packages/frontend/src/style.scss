@@ -634,5 +634,6 @@ rt {
 
 @keyframes mfm-blink {
 	0% { visibility: hidden; }
-	50% { visibility: visible; }
+	50% { visibility: hidden; }
+	100% { visibility: visible; }
 }
