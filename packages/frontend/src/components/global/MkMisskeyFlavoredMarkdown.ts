@@ -224,6 +224,15 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						}
 						return h(MkSparkle, {}, genEl(token.children, scale));
 					}
+					case 'blink': {
+						if (!useAnim) {
+							return genEl(token.children, scale);
+						}
+						const speed = validTime(token.props.args.speed) ?? '1s';
+						const delay = validTime(token.props.args.delay) ?? '0s';
+						style = `animation: mfm-blink ${speed} linear infinite; animation-delay: ${delay};`;
+						break;
+					}
 					case 'rotate': {
 						const degrees = safeParseFloat(token.props.args.deg) ?? 90;
 						style = `transform: rotate(${degrees}deg); transform-origin: center center;`;
