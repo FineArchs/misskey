@@ -47,6 +47,7 @@ export class FlashEntityService {
 			summary: flash.summary,
 			script: flash.script,
 			likedCount: flash.likedCount,
+			visibility: flash.visibility,
 			isLiked: meId ? await this.flashLikesRepository.exists({ where: { flashId: flash.id, userId: meId } }) : undefined,
 		});
 	}
