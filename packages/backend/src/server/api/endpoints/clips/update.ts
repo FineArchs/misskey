@@ -41,7 +41,7 @@ export const paramDef = {
 		isPublic: { type: 'boolean' },
 		description: { type: 'string', nullable: true, minLength: 1, maxLength: 2048 },
 	},
-	required: ['clipId', 'name'],
+	required: ['clipId'],
 } as const;
 
 @Injectable()
