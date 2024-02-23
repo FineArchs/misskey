@@ -82,14 +82,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.id) {
 				emojiId = ps.id;
 				const emoji = await this.customEmojiService.getEmojiById(ps.id);
-				emoji ?? throw new ApiError(meta.errors.noSuchEmoji);
+				if (emoji) throw new ApiError(meta.errors.noSuchEmoji);
 				if (ps.name !== emoji.name) {
 					const isDuplicate = await this.customEmojiService.checkDuplicate(ps.name);
 					if (isDuplicate) throw new ApiError(meta.errors.sameNameEmojiExists);
 				}
 			} else {
 				const emoji = await this.customEmojiService.getEmojiByName(ps.name);
-				emoji ?? throw new ApiError(meta.errors.noSuchEmoji);
+				if (emoji) throw new ApiError(meta.errors.noSuchEmoji);
 				emojiId = emoji.id;
 			}
 
