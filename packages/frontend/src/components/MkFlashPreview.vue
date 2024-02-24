@@ -17,17 +17,32 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p>{{ userName(flash.user) }}</p>
 		</footer>
 	</article>
+	<XButton v-if="showVisibility" class="summaryVisiSwitch" :checked="flash.visibility" @toggle="onToggleVisi"></XButton>
 </MkA>
 </template>
 
 <script lang="ts" setup>
 import { } from 'vue';
 import { userName } from '@/filters/user.js';
+import * as os from '@/os.js';
+import XButton from './MkSwitch.button.vue';
 
 const props = defineProps<{
 	//flash: Misskey.entities.Flash;
 	flash: any;
+	showVisibility: boolean;
 }>();
+
+function onToggleVisi() {
+	os.apiWithDialog('flash/update', {
+		flashId: flash.id,
+		title: flash.title,
+		summary: flash.summary,
+		permissions: flash.permissions,
+		script: flash.script,
+		visibility: flash.visibility === 'private' ? 'public' : 'private',
+	});
+}
 </script>
 
 <style lang="scss" scoped>
