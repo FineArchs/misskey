@@ -67,7 +67,7 @@ export const paramDef = {
 		withFile: { type: 'boolean' },
 		notify: { type: 'boolean' },
 	},
-	required: ['antennaId', 'name', 'src', 'keywords', 'excludeKeywords', 'users', 'caseSensitive', 'withReplies', 'withFile', 'notify'],
+	required: ['antennaId'],
 } as const;
 
 @Injectable()
