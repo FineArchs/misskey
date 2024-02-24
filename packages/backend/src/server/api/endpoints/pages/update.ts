@@ -108,7 +108,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			if (page.name !== ps.name) {
+			if (ps.name != null && ps.name !== page.name) {
 				await this.pagesRepository.findBy({
 					userId: me.id,
 					name: ps.name,
