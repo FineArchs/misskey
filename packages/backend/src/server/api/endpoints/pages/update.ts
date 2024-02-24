@@ -37,17 +37,12 @@ export const meta = {
 			id: '3c15cd52-3b4b-4274-967d-6456fc4f792b',
 		},
 
-		driveAccessDenied: {
-			message: 'Drive access denied.',
-			code: 'DRIVE_ACCESS_DENIED',
-			id: '07750e93-6f97-4226-b693-d5e2df818a8e',
-		},
-
 		noSuchFile: {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
 			id: 'cfc23c7c-3887-490e-af30-0ed576703c82',
 		},
+
 		nameAlreadyExists: {
 			message: 'Specified name already exists.',
 			code: 'NAME_ALREADY_EXISTS',
@@ -99,12 +94,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.eyeCatchingImageId != null) {
 				const eyeCatchingImage = await this.driveFilesRepository.findOneBy({
 					id: ps.eyeCatchingImageId,
+					userId: me.id,
 				});
 				if (eyeCatchingImage == null) {
 					throw new ApiError(meta.errors.noSuchFile);
-				}
-				if (eyeCatchingImage.userId !== me.id) {
-					throw new ApiError(meta.errors.driveAccessDenied);
 				}
 			}
 
