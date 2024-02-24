@@ -22541,16 +22541,16 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           pageId: string;
-          title: string;
-          name: string;
+          title?: string;
+          name?: string;
           summary?: string | null;
-          content: {
+          content?: {
               [key: string]: unknown;
             }[];
-          variables: {
+          variables?: {
               [key: string]: unknown;
             }[];
-          script: string;
+          script?: string;
           /** Format: misskey:id */
           eyeCatchingImageId?: string | null;
           /** @enum {string} */
