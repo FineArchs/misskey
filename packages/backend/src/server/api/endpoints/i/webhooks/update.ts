@@ -40,7 +40,7 @@ export const paramDef = {
 		} },
 		active: { type: 'boolean' },
 	},
-	required: ['webhookId', 'name', 'url', 'on', 'active'],
+	required: ['webhookId'],
 } as const;
 
 // TODO: ロジックをサービスに切り出す
