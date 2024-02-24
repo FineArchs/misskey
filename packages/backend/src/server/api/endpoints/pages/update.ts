@@ -123,7 +123,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				updatedAt: new Date(),
 				...Object.fromEntries(
 					Object.entries(ps).filter(([key, val]) => (
-						Object.hasOwn(paramDef.properties)
+						Object.hasOwn(paramDef.properties, key)
 						&& key !== 'pageId'
 					))
 				),
