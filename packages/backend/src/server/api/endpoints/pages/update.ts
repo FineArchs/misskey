@@ -4,7 +4,6 @@
  */
 
 import ms from 'ms';
-import { Not } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { PagesRepository, DriveFilesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
@@ -43,6 +42,7 @@ export const meta = {
 			code: 'NO_SUCH_FILE',
 			id: 'cfc23c7c-3887-490e-af30-0ed576703c82',
 		},
+
 		nameAlreadyExists: {
 			message: 'Specified name already exists.',
 			code: 'NAME_ALREADY_EXISTS',
@@ -70,7 +70,7 @@ export const paramDef = {
 		alignCenter: { type: 'boolean' },
 		hideTitleWhenPinned: { type: 'boolean' },
 	},
-	required: ['pageId', 'title', 'name', 'content', 'variables', 'script'],
+	required: ['pageId'],
 } as const;
 
 @Injectable()
@@ -91,48 +91,35 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.accessDenied);
 			}
 
-			let eyeCatchingImage = null;
 			if (ps.eyeCatchingImageId != null) {
-				eyeCatchingImage = await this.driveFilesRepository.findOneBy({
+				const eyeCatchingImage = await this.driveFilesRepository.findOneBy({
 					id: ps.eyeCatchingImageId,
 					userId: me.id,
 				});
-
 				if (eyeCatchingImage == null) {
 					throw new ApiError(meta.errors.noSuchFile);
 				}
 			}
 
-			await this.pagesRepository.findBy({
-				id: Not(ps.pageId),
-				userId: me.id,
-				name: ps.name,
-			}).then(result => {
-				if (result.length > 0) {
-					throw new ApiError(meta.errors.nameAlreadyExists);
-				}
-			});
+			if (ps.name != null && ps.name !== page.name) {
+				await this.pagesRepository.findBy({
+					userId: me.id,
+					name: ps.name,
+				}).then(result => {
+					if (result.length > 0) {
+						throw new ApiError(meta.errors.nameAlreadyExists);
+					}
+				});
+			}
 
 			await this.pagesRepository.update(page.id, {
 				updatedAt: new Date(),
-				title: ps.title,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				name: ps.name === undefined ? page.name : ps.name,
-				summary: ps.summary === undefined ? page.summary : ps.summary,
-				content: ps.content,
-				variables: ps.variables,
-				script: ps.script,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				alignCenter: ps.alignCenter === undefined ? page.alignCenter : ps.alignCenter,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				hideTitleWhenPinned: ps.hideTitleWhenPinned === undefined ? page.hideTitleWhenPinned : ps.hideTitleWhenPinned,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				font: ps.font === undefined ? page.font : ps.font,
-				eyeCatchingImageId: ps.eyeCatchingImageId === null
-					? null
-					: ps.eyeCatchingImageId === undefined
-						? page.eyeCatchingImageId
-						: eyeCatchingImage!.id,
+				...Object.fromEntries(
+					Object.entries(ps).filter(([key, val]) => (
+						Object.hasOwn(paramDef.properties, key)
+						&& key !== 'pageId'
+					))
+				),
 			});
 		});
 	}
