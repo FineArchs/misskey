@@ -32,6 +32,12 @@ export const meta = {
 			code: 'NO_SUCH_USER_LIST',
 			id: '1c6b35c9-943e-48c2-81e4-2844989407f7',
 		},
+
+		keywordsRequired: {
+			message: 'Either keywords or excludeKeywords is required.',
+			code: 'KEYWORD_REQUIRED',
+			id: '74ccf0e2-12cd-40ed-93ac-71f26907ac8e',
+		},
 	},
 
 	res: {
@@ -83,21 +89,24 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private globalEventService: GlobalEventService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
-				throw new Error('either keywords or excludeKeywords is required.');
-			}
 			// Fetch the antenna
 			const antenna = await this.antennasRepository.findOneBy({
 				id: ps.antennaId,
 				userId: me.id,
 			});
-
 			if (antenna == null) {
 				throw new ApiError(meta.errors.noSuchAntenna);
 			}
 
+			if (ps.keywords !== undefined || ps.excludeKeywords !== undefined) {
+				const keywords = ps.keywords ?? antenna.keywords;
+				const excludeKeywords = ps.excludeKeywords ?? antenna.excludeKeywords;
+				if (keywords.flat().every(x => x === '') && excludeKeywords.flat().every(x => x === '')) {
+					throw new ApiError(meta.errors.keywordsRequired);
+				}
+			}
+			
 			let userList;
-
 			if (ps.src === 'list' && ps.userListId) {
 				userList = await this.userListsRepository.findOneBy({
 					id: ps.userListId,
