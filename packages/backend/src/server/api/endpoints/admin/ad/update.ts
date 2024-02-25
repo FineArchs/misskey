@@ -63,8 +63,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ratio: ps.ratio,
 				memo: ps.memo,
 				imageUrl: ps.imageUrl,
-				expiresAt: new Date(ps.expiresAt),
-				startsAt: new Date(ps.startsAt),
+				expiresAt: ps.expiresAt == null ? ps.expiresAt : new Date(ps.expiresAt),
+				startsAt: ps.startsAt == null ? ps.startsAt : new Date(ps.startsAt),
 				dayOfWeek: ps.dayOfWeek,
 			});
 
