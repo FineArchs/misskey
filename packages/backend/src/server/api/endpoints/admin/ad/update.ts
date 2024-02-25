@@ -40,7 +40,7 @@ export const paramDef = {
 		startsAt: { type: 'integer' },
 		dayOfWeek: { type: 'integer' },
 	},
-	required: ['id', 'memo', 'url', 'imageUrl', 'place', 'priority', 'ratio', 'expiresAt', 'startsAt', 'dayOfWeek'],
+	required: ['id'],
 } as const;
 
 @Injectable()
