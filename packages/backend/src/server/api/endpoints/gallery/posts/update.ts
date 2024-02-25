@@ -11,6 +11,7 @@ import type { MiDriveFile } from '@/models/DriveFile.js';
 import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { ApiError } from '@/server/api/error.js';
 
 export const meta = {
 	tags: ['gallery'],
@@ -33,7 +34,11 @@ export const meta = {
 	},
 
 	errors: {
-
+		noValidFile: {
+			message: 'None of the file IDs are valid. (at least one is required)',
+			code: 'NO_VALID_FILE',
+			id: 'd5289dfe-58a6-40b1-ba2c-58e72643808b',
+		},
 	},
 } as const;
 
@@ -48,7 +53,7 @@ export const paramDef = {
 		} },
 		isSensitive: { type: 'boolean', default: false },
 	},
-	required: ['postId', 'title', 'fileIds'],
+	required: ['postId'],
 } as const;
 
 @Injectable()
@@ -63,15 +68,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private galleryPostEntityService: GalleryPostEntityService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const files = (await Promise.all(ps.fileIds.map(fileId =>
-				this.driveFilesRepository.findOneBy({
-					id: fileId,
-					userId: me.id,
-				}),
-			))).filter(isNotNull);
+			let fileIds = undefined;
+			if (ps.fileIds !== undefined) {
+				const files = (await Promise.all(ps.fileIds.map(fileId =>
+					this.driveFilesRepository.findOneBy({
+						id: fileId,
+						userId: me.id,
+					}),
+				// exclude invalid file IDs
+				))).filter(isNotNull);
 
-			if (files.length === 0) {
-				throw new Error();
+				// at least one valid file is required
+				if (files.length === 0) {
+					throw new ApiError(meta.errors.noValidFile);
+				}
+				fileIds = files.map(file => file.id);
 			}
 
 			await this.galleryPostsRepository.update({
@@ -82,7 +93,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				title: ps.title,
 				description: ps.description,
 				isSensitive: ps.isSensitive,
-				fileIds: files.map(file => file.id),
+				fileIds,
 			});
 
 			const post = await this.galleryPostsRepository.findOneByOrFail({ id: ps.postId });
