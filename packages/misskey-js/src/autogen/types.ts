@@ -5413,15 +5413,15 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           id: string;
-          memo: string;
-          url: string;
-          imageUrl: string;
-          place: string;
-          priority: string;
-          ratio: number;
-          expiresAt: number;
-          startsAt: number;
-          dayOfWeek: number;
+          memo?: string;
+          url?: string;
+          imageUrl?: string;
+          place?: string;
+          priority?: string;
+          ratio?: number;
+          expiresAt?: number;
+          startsAt?: number;
+          dayOfWeek?: number;
         };
       };
     };
@@ -9900,19 +9900,19 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           antennaId: string;
-          name: string;
+          name?: string;
           /** @enum {string} */
-          src: 'home' | 'all' | 'users' | 'list' | 'users_blacklist';
+          src?: 'home' | 'all' | 'users' | 'list' | 'users_blacklist';
           /** Format: misskey:id */
           userListId?: string | null;
-          keywords: string[][];
-          excludeKeywords: string[][];
-          users: string[];
-          caseSensitive: boolean;
+          keywords?: string[][];
+          excludeKeywords?: string[][];
+          users?: string[];
+          caseSensitive?: boolean;
           localOnly?: boolean;
-          withReplies: boolean;
-          withFile: boolean;
-          notify: boolean;
+          withReplies?: boolean;
+          withFile?: boolean;
+          notify?: boolean;
         };
       };
     };
@@ -12587,7 +12587,7 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           clipId: string;
-          name: string;
+          name?: string;
           isPublic?: boolean;
           description?: string | null;
         };
@@ -15434,9 +15434,9 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           postId: string;
-          title: string;
+          title?: string;
           description?: string | null;
-          fileIds: string[];
+          fileIds?: string[];
           /** @default false */
           isSensitive?: boolean;
         };
@@ -19217,12 +19217,12 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           webhookId: string;
-          name: string;
-          url: string;
+          name?: string;
+          url?: string;
           /** @default */
           secret?: string;
-          on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
-          active: boolean;
+          on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+          active?: boolean;
         };
       };
     };
@@ -22541,16 +22541,16 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           pageId: string;
-          title: string;
-          name: string;
+          title?: string;
+          name?: string;
           summary?: string | null;
-          content: {
+          content?: {
               [key: string]: unknown;
             }[];
-          variables: {
+          variables?: {
               [key: string]: unknown;
             }[];
-          script: string;
+          script?: string;
           /** Format: misskey:id */
           eyeCatchingImageId?: string | null;
           /** @enum {string} */
