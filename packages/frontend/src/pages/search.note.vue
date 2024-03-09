@@ -34,6 +34,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 
+	<div v-if="lookedUpNote || lookedUpUser">
+		<header>{{ i18n.ts.lookup }}</header>
+		<MkNote v-if="lookedUpNote" :note="lookedUpNote"/>
+		<MkUserInfo v-if="lookedUpUser" :user="lookedUpUser"/>
+	</div>
 	<MkFoldableSection v-if="notePagination">
 		<template #header>{{ i18n.ts.searchResult }}</template>
 		<MkNotes :key="key" :pagination="notePagination"/>
@@ -43,6 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import MkNotes from '@/components/MkNotes.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -53,6 +59,8 @@ import { misskeyApi } from '@/scripts/misskey-api.js';
 import MkFoldableSection from '@/components/MkFoldableSection.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import { useRouter } from '@/router/supplier.js';
+import MkNote from '@/components/MkNote.vue';
+import MkUserInfo from '@/components/MkUserInfo.vue';
 
 const router = useRouter();
 
@@ -62,6 +70,8 @@ const searchOrigin = ref('combined');
 const notePagination = ref();
 const user = ref<any>(null);
 const isLocalOnly = ref(false);
+const lookedUpNote = ref<null | Misskey.entities.Note>(null);
+const lookedUpUser = ref<null | Misskey.entities.UserDetailed>(null);
 
 function selectUser() {
 	os.selectUser({ includeSelf: true }).then(_user => {
@@ -70,26 +80,23 @@ function selectUser() {
 }
 
 async function search() {
+	lookedUpNote.value = null;
+	lookedUpUser.value = null;
 	const query = searchQuery.value.toString().trim();
 
 	if (query == null || query === '') return;
 
+	// 照会
 	if (query.startsWith('https://')) {
-		const promise = misskeyApi('ap/show', {
+		misskeyApi('ap/show', {
 			uri: query,
-		});
-
-		os.promiseDialog(promise, null, null, i18n.ts.fetchingAsApObject);
-
-		const res = await promise;
-
-		if (res.type === 'User') {
-			router.push(`/@${res.object.username}@${res.object.host}`);
-		} else if (res.type === 'Note') {
-			router.push(`/notes/${res.object.id}`);
-		}
-
-		return;
+		}).then(res => {
+			if (res.type === 'Note') {
+				lookedUpNote.value = res.object;
+			} else if (res.type === 'User') {
+				lookedUpUser.value = res.object;
+			}
+		})
 	}
 
 	notePagination.value = {
