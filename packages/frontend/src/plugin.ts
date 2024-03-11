@@ -24,7 +24,7 @@ export async function install(plugin: Plugin): Promise<void> {
 		in: aiScriptReadline,
 		out: (value): void => {
 			console.log(value);
-			pluginLoggers.value.get(plugin.id).push(utils.replValue(value));
+			pluginLoggers.value.get(plugin.id).push(utils.reprValue(value));
 		},
 		log: (): void => {
 		},
