@@ -47,10 +47,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<div class="_gaps_s">
 						<div class="_buttons">
-							<MkButton inline @click="copy(pluginLoggers.get(plugin.id).join('\n'))"><i class="ti ti-copy"></i> {{ i18n.ts.copy }}</MkButton>
+							<MkButton inline @click="copy(pluginLoggers.get(plugin.id)?.join('\n'))"><i class="ti ti-copy"></i> {{ i18n.ts.copy }}</MkButton>
 						</div>
 
-						<MkCode :code="pluginLoggers.get(plugin.id).join('\n') ?? ''"/>
+						<MkCode :code="pluginLoggers.get(plugin.id)?.join('\n') ?? ''"/>
 					</div>
 				</MkFolder>
 
