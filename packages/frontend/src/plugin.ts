@@ -101,6 +101,7 @@ function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Record<s
 
 function initPlugin({ plugin, aiscript }): void {
 	pluginContexts.set(plugin.id, aiscript);
+	pluginLoggers.set(plugin.id, []);
 }
 
 function registerPostFormAction({ pluginId, title, handler }): void {
