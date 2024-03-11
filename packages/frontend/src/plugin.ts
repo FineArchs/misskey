@@ -39,7 +39,7 @@ export async function install(plugin: Plugin): Promise<void> {
 
 	aiscript.exec(parser.parse(plugin.src)).then(
 		() => {
-			console.info('Plugin installed:', plugin.name, 'v' + plugin.version),
+			console.info('Plugin installed:', plugin.name, 'v' + plugin.version);
 		},
 		(err) => {
 			console.error('Plugin install failed:', plugin.name, 'v' + plugin.version);
