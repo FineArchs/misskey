@@ -37,14 +37,15 @@ export async function install(plugin: Plugin): Promise<void> {
 
 	initPlugin({ plugin, aiscript });
 
-	try {
-		await aiscript.exec(parser.parse(plugin.src));
-	} catch (err) {
-		console.error('Plugin install failed:', plugin.name, 'v' + plugin.version);
-		return;
-	}
-
-	console.info('Plugin installed:', plugin.name, 'v' + plugin.version);
+	aiscript.exec(parser.parse(plugin.src)).then(
+		() => {
+			console.info('Plugin installed:', plugin.name, 'v' + plugin.version),
+		},
+		(err) => {
+			console.error('Plugin install failed:', plugin.name, 'v' + plugin.version);
+			throw err;
+		},
+	);
 }
 
 function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Record<string, values.Value> {
