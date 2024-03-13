@@ -29,23 +29,24 @@ class AsOutTL {
   constructor(){}
   readonly logs = ref<AsOutLog[]>([]);
   private push(type: AsOutLog['type'], text: string) {
-    logs.value.push({type, text, id: Math.random().toString()});
+    this.logs.value.push({type, text, id: Math.random().toString()});
   }
+	flush() { this.logs.value = [] }
   out(value: values.Value): void {
-    push('out', value.type === 'str' ? value.value : utils.valToString(value));
+    this.push('out', value.type === 'str' ? value.value : utils.valToString(value));
   }
   log(type: string, params: values.Value): void {
     switch (type) {
       case 'end':
-        push('log', utils.valToString(params.val, true));
+        this.push('log', utils.valToString(params.val, true));
       default: break;
     }
   }
   logManually(mes: string): void {
-    push('log', mes);
+    this.push('log', mes);
   }
   err(err: errors.AiScriptError): void {
-    push('err', `${err}`);
+    this.push('err', `${err}`);
   }
 }
 </script>
