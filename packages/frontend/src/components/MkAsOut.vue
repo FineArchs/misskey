@@ -10,22 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-export { AsOutTL };
-</script>
-
-<script lang="ts" setup>
-import { ref } from 'vue';
-import { values, utils, errors } from '@syuilo/aiscript';
-
-const model = defineModel<AsOutTL>({ required: true });
-
-type AsOutLog = {
-  type: 'out' | 'log' | 'err',
-  text: string,
-  id: string,
-};
-
-class AsOutTL {
+export class AsOutTL {
   constructor(){}
   readonly logs = ref<AsOutLog[]>([]);
   private push(type: AsOutLog['type'], text: string) {
@@ -48,7 +33,20 @@ class AsOutTL {
   err(err: errors.AiScriptError): void {
     this.push('err', `${err}`);
   }
-}
+};
+</script>
+
+<script lang="ts" setup>
+import { ref } from 'vue';
+import { values, utils, errors } from '@syuilo/aiscript';
+
+const model = defineModel<AsOutTL>({ required: true });
+
+type AsOutLog = {
+  type: 'out' | 'log' | 'err',
+  text: string,
+  id: string,
+};
 </script>
 
 <style lang="scss" module>
