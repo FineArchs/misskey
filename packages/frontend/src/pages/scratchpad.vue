@@ -25,9 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkContainer :foldable="true" class="">
 				<template #header>{{ i18n.ts.output }}</template>
-				<div :class="$style.logs">
-					<div v-for="log in logs" :key="log.id" class="log" :class="{ print: log.print }">{{ log.text }}</div>
-				</div>
+				<MkAsOut v-model="logtl"/>
 			</MkContainer>
 
 			<div class="">
@@ -51,13 +49,14 @@ import { i18n } from '@/i18n.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
 import { AsUiComponent, AsUiRoot, registerAsUiLib } from '@/scripts/aiscript/ui.js';
 import MkAsUi from '@/components/MkAsUi.vue';
+import MkAsOut, { AsOutTL } from '@/components/MkAsOut.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/scripts/achievements.js';
 
 const parser = new Parser();
 let aiscript: Interpreter;
 const code = ref('');
-const logs = ref<any[]>([]);
+const logtl = new AsOutTL();
 const root = ref<AsUiRoot>();
 const components = ref<Ref<AsUiComponent>[]>([]);
 const uiKey = ref(0);
@@ -76,7 +75,7 @@ async function run() {
 	root.value = undefined;
 	components.value = [];
 	uiKey.value++;
-	logs.value = [];
+	logtl.flush();
 	aiscript = new Interpreter(({
 		...createAiScriptEnv({
 			storageKey: 'widget',
@@ -91,11 +90,7 @@ async function run() {
 			if (value.type === 'str' && value.value.toLowerCase().replace(',', '').includes('hello world')) {
 				claimAchievement('outputHelloWorldOnScratchpad');
 			}
-			logs.value.push({
-				id: Math.random(),
-				text: value.type === 'str' ? value.value : utils.valToString(value),
-				print: true,
-			});
+			logtl.out(value);
 		},
 		err: (err) => {
 			os.alert({
@@ -103,17 +98,9 @@ async function run() {
 				title: 'AiScript Error',
 				text: err.toString(),
 			});
+			logtl.err(err);
 		},
-		log: (type, params) => {
-			switch (type) {
-				case 'end': logs.value.push({
-					id: Math.random(),
-					text: utils.valToString(params.val, true),
-					print: false,
-				}); break;
-				default: break;
-			}
-		},
+		log: logtl.log,
 	});
 
 	let ast;
@@ -179,17 +166,5 @@ definePageMetadata(() => ({
 
 .ui {
 	padding: 32px;
-}
-
-.logs {
-	padding: 16px;
-
-	&:global {
-		> .log {
-			&:not(.print) {
-				opacity: 0.7;
-			}
-		}
-	}
 }
 </style>
