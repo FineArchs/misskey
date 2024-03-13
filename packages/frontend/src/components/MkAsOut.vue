@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-export AsOutTL;
+export { AsOutTL };
 </script>
 
 <script lang="ts" setup>
