@@ -671,3 +671,9 @@ rt {
 	0% { filter: hue-rotate(0deg) contrast(150%) saturate(150%); }
 	100% { filter: hue-rotate(360deg) contrast(150%) saturate(150%); }
 }
+
+@keyframes mfm-blink {
+	0% { visibility: hidden; }
+	50% { visibility: hidden; }
+	100% { visibility: visible; }
+}
