@@ -671,3 +671,12 @@ rt {
 	0% { filter: hue-rotate(0deg) contrast(150%) saturate(150%); }
 	100% { filter: hue-rotate(360deg) contrast(150%) saturate(150%); }
 }
+
+@keyframes mfm-slideX {
+	0% { transform: translateX(0%); }
+	100% { transform: translateX(-100%); }
+}
+@keyframes mfm-slideY {
+	0% { transform: translateY(0%); }
+	100% { transform: translateY(100%); }
+}
