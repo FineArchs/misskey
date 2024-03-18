@@ -237,10 +237,16 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						break;
 					}
 					case 'slide': {
+						if (!useanim) { style = ''; break; }
+						const isVertical = token.props.args.up || token.props.args.down;
+						const anim = isVertical ? 'mfm-slideY' : 'mfm-slideX';
 						const speed = validTime(token.props.args.speed) ?? '0.5s';
+						const reverse = (token.props.args.right || token.props.args.down) ? 'reverse' : '';
 						const delay = validTime(token.props.args.delay) ?? '0s';
-						style = useAnim ? `animation: mfm-slide ${speed} linear infinite; animation-delay: ${delay};` : '';
-						break;
+						style = `animation: ${anim} ${speed} ${reverse} linear infinite; animation-delay: ${delay};`;
+						return h('span',  {
+							style: `overflow-${isVertical ? 'y' : 'x'}: hidden`;
+						}, genEl(token.children, scale));
 					}
 					case 'scale': {
 						if (!defaultStore.state.advancedMfm) {
