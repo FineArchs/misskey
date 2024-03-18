@@ -236,6 +236,12 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						style = `transform: translateX(${x}em) translateY(${y}em);`;
 						break;
 					}
+					case 'slide': {
+						const speed = validTime(token.props.args.speed) ?? '0.5s';
+						const delay = validTime(token.props.args.delay) ?? '0s';
+						style = useAnim ? `animation: mfm-slide ${speed} linear infinite; animation-delay: ${delay};` : '';
+						break;
+					}
 					case 'scale': {
 						if (!defaultStore.state.advancedMfm) {
 							style = '';
