@@ -673,10 +673,10 @@ rt {
 }
 
 @keyframes mfm-slideX {
-	0% { transform: translateX(0%); }
-	100% { transform: translateX(-100%); }
+	0% { transform: translateX(50%); }
+	100% { transform: translateX(-50%); }
 }
 @keyframes mfm-slideY {
-	0% { transform: translateY(0%); }
-	100% { transform: translateY(100%); }
+	0% { transform: translateY(-50%); }
+	100% { transform: translateY(50%); }
 }
