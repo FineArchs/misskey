@@ -326,7 +326,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						]);
 					}
 					case 'overlap': {
-						return h('span', {}, applySep(token.children, token.props.args.SEP).map(
+						return h('span', {}, separate(token.children, token.props.args.SEP).map(
 							(v,i) => i === 0
 								? genEl(v, scale)
 								: h('span', { style: 'position: absolute;' }, genEl(v, scale))
