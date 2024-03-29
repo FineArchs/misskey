@@ -70,6 +70,19 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 		return c.match(/^[0-9a-f]{3,6}$/i) ? c : null;
 	};
 
+	const SEP = {
+		space: ' ',
+		lf: '\n',
+		comma: ',',
+		semicolon: ';',
+	} as const;
+	const applySep = (ast: mfm.MfmNode[], sep: keyof typeof SEP = 'space'): mfm.MfmNode[] => {
+		return ast.map((v, i) => v.type === 'text'
+			? v.props.text.split(SEP[sep]).map(t => ({ type: 'text', props: { text: t } }))
+			: v
+		).flat();
+	}
+
 	const useAnim = defaultStore.state.advancedMfm && defaultStore.state.animatedMfm;
 
 	/**
@@ -308,8 +321,10 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						]);
 					}
 					case 'overlap': {
-						return h('span', {}, token.children.map(
-							(v,i) => i ? genEl([v], scale) : h('span', { style: 'position: absolute;' }, genEl([v], scale))
+						return h('span', {}, applySep(token.children, token.props.SEP).map(
+							(v,i) => i === 0
+								? genEl([v], scale)
+								: h('span', { style: 'position: absolute;' }, genEl([v], scale))
 						));
 					}
 					case 'clickable': {
