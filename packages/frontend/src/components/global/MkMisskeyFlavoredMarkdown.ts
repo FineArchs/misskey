@@ -309,7 +309,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 					}
 					case 'overlap': {
 						return h('span', {}, token.children.map(
-							(v,i) => i ? genEl([v], scale) : h('span', { style: 'position: absolute;' }, genEl(v, scale))
+							(v,i) => i ? genEl([v], scale) : h('span', { style: 'position: absolute;' }, genEl([v], scale))
 						));
 					}
 					case 'clickable': {
