@@ -76,11 +76,16 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 		comma: ',',
 		semicolon: ';',
 	} as const;
-	const applySep = (ast: mfm.MfmNode[], sep: keyof typeof SEP = 'space'): mfm.MfmNode[] => {
-		return ast.map((v, i) => v.type === 'text'
-			? v.props.text.split(SEP[sep]).map(t => ({ type: 'text', props: { text: t } }))
-			: v
-		).flat();
+	const separate = (ast: mfm.MfmNode[], sep: keyof typeof SEP = 'space'): mfm.MfmNode[][] => {
+		let tmp: mfm.MfmNode[][] = [[]];
+		for (const node in ast) {
+			if (node.type === 'text') {
+				const texts = node.props.text.split(SEP[sep]).map(t => [mfm.TEXT(t)]);
+				tmp.at(-1).push(texts[0][0]);
+				tmp.concat(texts.slice(1));
+			} else tmp.at(-1).push(node);
+		}
+		return tmp;
 	}
 
 	const useAnim = defaultStore.state.advancedMfm && defaultStore.state.animatedMfm;
@@ -321,10 +326,10 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 						]);
 					}
 					case 'overlap': {
-						return h('span', {}, applySep(token.children, token.props.SEP).map(
+						return h('span', {}, applySep(token.children, token.props.args.SEP).map(
 							(v,i) => i === 0
-								? genEl([v], scale)
-								: h('span', { style: 'position: absolute;' }, genEl([v], scale))
+								? genEl(v, scale)
+								: h('span', { style: 'position: absolute;' }, genEl(v, scale))
 						));
 					}
 					case 'clickable': {
