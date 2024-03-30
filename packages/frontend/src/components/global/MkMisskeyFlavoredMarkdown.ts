@@ -85,6 +85,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 				tmp.concat(texts.slice(1));
 			} else tmp.at(-1).push(node);
 		}
+		console.log(tmp);
 		return tmp;
 	}
 
