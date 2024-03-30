@@ -77,7 +77,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 		semicolon: ';',
 	} as const;
 	const separate = (ast: mfm.MfmNode[], sep: keyof typeof SEP = 'space'): mfm.MfmNode[][] => {
-		let tmp: mfm.MfmNode[][] = [[]];
+		const tmp: mfm.MfmNode[][] = [[]];
 		for (const node of ast) {
 			if (node.type === 'text') {
 				const texts = node.props.text.split(SEP[sep]).map(t => [mfm.TEXT(t)]);
@@ -87,7 +87,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 		}
 		console.log(tmp);
 		return tmp;
-	}
+	};
 
 	const useAnim = defaultStore.state.advancedMfm && defaultStore.state.animatedMfm;
 
@@ -329,7 +329,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 					case 'overlap': {
 						const children = separate(token.children, token.props.args.SEP);
 						return h('span', { style: 'position: relative;' }, children.map(
-							(v,i) => i === children.length - 1
+							(v, i) => i === children.length - 1
 								? h('span', { style: 'position: relative;' }, genEl(v, scale))
 								: h('span', { style: 'position: absolute;' }, genEl(v, scale))
 						));
