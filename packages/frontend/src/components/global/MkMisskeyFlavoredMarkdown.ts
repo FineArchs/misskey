@@ -328,9 +328,9 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 					}
 					case 'overlap': {
 						const children = separate(token.children, token.props.args.SEP);
-						return h('span', {}, children.map(
+						return h('span', { style: 'position: relative;' }, children.map(
 							(v,i) => i === children.length - 1
-								? genEl(v, scale)
+								? h('span', { style: 'position: relative;' }, genEl(v, scale))
 								: h('span', { style: 'position: absolute;' }, genEl(v, scale))
 						));
 					}
