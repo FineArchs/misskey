@@ -82,7 +82,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 			if (node.type === 'text') {
 				const texts = node.props.text.split(SEP[sep]).map(t => [mfm.TEXT(t)]);
 				tmp.at(-1).push(texts[0][0]);
-				tmp.concat(texts.slice(1));
+				tmp.push(...texts.slice(1));
 			} else tmp.at(-1).push(node);
 		}
 		console.log(tmp);
