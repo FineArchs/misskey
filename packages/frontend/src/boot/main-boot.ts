@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+// touch
 import { createApp, defineAsyncComponent, markRaw } from 'vue';
 import { common } from './common.js';
 import { ui } from '@/config.js';
