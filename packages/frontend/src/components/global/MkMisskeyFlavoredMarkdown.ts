@@ -78,7 +78,7 @@ export default function (props: MfmProps, { emit }: { emit: SetupContext<MfmEven
 	} as const;
 	const separate = (ast: mfm.MfmNode[], sep: keyof typeof SEP = 'space'): mfm.MfmNode[][] => {
 		let tmp: mfm.MfmNode[][] = [[]];
-		for (const node in ast) {
+		for (const node of ast) {
 			if (node.type === 'text') {
 				const texts = node.props.text.split(SEP[sep]).map(t => [mfm.TEXT(t)]);
 				tmp.at(-1).push(texts[0][0]);
