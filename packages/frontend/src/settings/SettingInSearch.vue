@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkSwitch v-if="def.kind == 'switch' v-model="store">{{ def.title }}</MkSwitch>
+<MkSwitch v-if="def.kind == 'switch'" v-model="store">{{ def.title }}</MkSwitch>
 </template>
 
 <script lang="ts" setup>
