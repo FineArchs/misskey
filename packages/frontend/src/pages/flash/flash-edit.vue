@@ -468,6 +468,5 @@ definePageMetadata(() => ({
 <style lang="scss" module>
 .footer {
 	background: var(--panel);
-	border-top: solid 0.5px var(--divider);
 }
 </style>
