@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps">
 			<MkInput v-model="title">
 				<template #label>{{ i18n.ts._play.title }}</template>
-			</MkInput
+			</MkInput>
 			<MkSelect v-model="visibility">
 				<template #label>{{ i18n.ts.visibility }}</template>
 				<template #caption>{{ i18n.ts._play.visibilityDescription }}</template>
