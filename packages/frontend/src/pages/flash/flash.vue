@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<Transition :name="defaultStore.state.animation ? 'zoom' : ''" mode="out-in">
 					<div v-if="started" :class="$style.started">
 						<div class="main _panel">
-							<MkAsUi v-if="root" :component="root" :components="components"/>
+							<MkAsUi v-if="root" :cid="'___root___'" :components="components"/>
 						</div>
 						<div class="actions _panel">
 							<div class="items">
@@ -180,7 +180,7 @@ const parser = new Parser();
 const started = ref(false);
 const aiscript = shallowRef<Interpreter | null>(null);
 const root = ref<AsUiRoot>();
-const components = ref<Ref<AsUiComponent>[]>([]);
+const components = ref<Map<string, Ref<AsUiComponent>>>(new Map());
 
 function start() {
 	started.value = true;
