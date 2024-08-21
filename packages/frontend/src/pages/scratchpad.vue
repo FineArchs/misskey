@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkContainer v-if="root && components.length > 1" :key="uiKey" :foldable="true">
 				<template #header>UI</template>
 				<div :class="$style.ui">
-					<MkAsUi :component="root" :components="components" size="small"/>
+					<MkAsUi :cid="'___root___'" :components="components" size="small"/>
 				</div>
 			</MkContainer>
 
@@ -58,8 +58,7 @@ const parser = new Parser();
 let aiscript: Interpreter;
 const code = ref('');
 const logs = ref<any[]>([]);
-const root = ref<AsUiRoot>();
-const components = ref<Ref<AsUiComponent>[]>([]);
+const components = ref<Map<string, Ref<AsUiComponent>>>(new Map());
 const uiKey = ref(0);
 
 const saved = miLocalStorage.getItem('scratchpad');
@@ -74,7 +73,7 @@ watch(code, () => {
 async function run() {
 	if (aiscript) aiscript.abort();
 	root.value = undefined;
-	components.value = [];
+	components.value.clear();
 	uiKey.value++;
 	logs.value = [];
 	aiscript = new Interpreter(({
@@ -82,9 +81,7 @@ async function run() {
 			storageKey: 'widget',
 			token: $i?.token,
 		}),
-		...registerAsUiLib(components.value, (_root) => {
-			root.value = _root.value;
-		}),
+		...registerAsUiLib(components.value),
 	}), {
 		in: aiScriptReadline,
 		out: (value) => {
