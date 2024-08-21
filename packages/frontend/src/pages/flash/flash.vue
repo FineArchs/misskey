@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<Transition :name="defaultStore.state.animation ? 'zoom' : ''" mode="out-in">
 					<div v-if="started" :class="$style.started">
 						<div class="main _panel">
-							<MkAsUi v-if="root" :cid="'___root___'" :components="components"/>
+							<MkAsUi :cid="'___root___'" :components="components"/>
 						</div>
 						<div class="actions _panel">
 							<div class="items">
