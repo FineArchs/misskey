@@ -502,7 +502,7 @@ function getPostFormOptions(def: values.Value | undefined, call: (fn: values.VFn
 	};
 }
 
-export function registerAsUiLib(components: Map<string, Ref<AsUiComponent>>, done: (root: Ref<AsUiRoot>) => void) {
+export function registerAsUiLib(components: Map<string, Ref<AsUiComponent>>, done?: (root: Ref<AsUiRoot>) => void) {
 	const instances = new Map<string, values.Value>();
 
 	function createComponentInstance(type: AsUiComponent['type'], def: values.Value | undefined, id: values.Value | undefined, getOptions: (def: values.Value | undefined, call: (fn: values.VFn, args: values.Value[]) => Promise<values.Value>) => any, call: (fn: values.VFn, args: values.Value[]) => Promise<values.Value>) {
