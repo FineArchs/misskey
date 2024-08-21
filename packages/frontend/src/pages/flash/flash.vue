@@ -179,7 +179,6 @@ const parser = new Parser();
 
 const started = ref(false);
 const aiscript = shallowRef<Interpreter | null>(null);
-const root = ref<AsUiRoot>();
 const components = ref<Map<string, Ref<AsUiComponent>>>(new Map());
 
 function start() {
@@ -195,9 +194,7 @@ async function run() {
 		...createAiScriptEnv({
 			storageKey: 'flash:' + flash.value.id,
 		}),
-		...registerAsUiLib(components.value, (_root) => {
-			root.value = _root.value;
-		}),
+		...registerAsUiLib(components.value),
 		THIS_ID: values.STR(flash.value.id),
 		THIS_URL: values.STR(`${url}/play/${flash.value.id}`),
 	}, {
