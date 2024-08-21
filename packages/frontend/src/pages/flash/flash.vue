@@ -189,6 +189,7 @@ function start() {
 async function run() {
 	if (aiscript.value) aiscript.value.abort();
 	if (!flash.value) return;
+	components.value.clear();
 
 	aiscript.value = new Interpreter({
 		...createAiScriptEnv({
