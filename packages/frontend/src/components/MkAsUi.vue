@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div>
 	<div v-if="c.type === 'root'" :class="$style.root">
 		<template v-for="child in c.children" :key="child">
-			<MkAsUi v-if="!g(child).hidden" :component="g(child)" :components="props.components" :size="size"/>
+			<MkAsUi v-if="!g(child).hidden" :cid="child" :components="props.components" :size="size"/>
 		</template>
 	</div>
 	<span v-else-if="c.type === 'text'" :class="{ [$style.fontSerif]: c.font === 'serif', [$style.fontMonospace]: c.font === 'monospace' }" :style="{ fontSize: c.size ? `${c.size * 100}%` : undefined, fontWeight: c.bold ? 'bold' : undefined, color: c.color }">{{ c.text }}</span>
@@ -56,7 +56,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</MkFolder>
 	<div v-else-if="c.type === 'container'" :class="[$style.container, { [$style.fontSerif]: c.font === 'serif', [$style.fontMonospace]: c.font === 'monospace' }]" :style="{ textAlign: c.align, backgroundColor: c.bgColor, color: c.fgColor, borderWidth: c.borderWidth ? `${c.borderWidth}px` : 0, borderColor: c.borderColor ?? 'var(--divider)', padding: c.padding ? `${c.padding}px` : 0, borderRadius: c.rounded ? '8px' : 0 }">
 		<template v-for="child in c.children" :key="child">
-			<MkAsUi v-if="!g(child).hidden" :component="g(child)" :components="props.components" :size="size" :align="c.align"/>
+			<MkAsUi v-if="!g(child).hidden" :cid="child" :components="props.components" :size="size" :align="c.align"/>
 		</template>
 	</div>
 </div>
@@ -75,8 +75,8 @@ import MkFolder from '@/components/MkFolder.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
 
 const props = withDefaults(defineProps<{
-	component: AsUiComponent;
-	components: Ref<AsUiComponent>[];
+	cid: string;
+	components: Map<string, Ref<AsUiComponent>>;
 	size: 'small' | 'medium' | 'large';
 	align: 'left' | 'center' | 'right';
 }>(), {
@@ -84,10 +84,10 @@ const props = withDefaults(defineProps<{
 	align: 'left',
 });
 
-const c = props.component;
+const c = props.components.get(props.cid).value;
 
 function g(id) {
-	const v = props.components.find(x => x.value.id === id)?.value;
+	const v = props.components.get(id).value;
 	if (v) return v;
 
 	return {
