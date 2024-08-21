@@ -502,8 +502,8 @@ function getPostFormOptions(def: values.Value | undefined, call: (fn: values.VFn
 	};
 }
 
-export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: Ref<AsUiRoot>) => void) {
-	const instances = {};
+export function registerAsUiLib(components: Map<string, Ref<AsUiComponent>>, done: (root: Ref<AsUiRoot>) => void) {
+	const instances = new Map<string, values.Value>();
 
 	function createComponentInstance(type: AsUiComponent['type'], def: values.Value | undefined, id: values.Value | undefined, getOptions: (def: values.Value | undefined, call: (fn: values.VFn, args: values.Value[]) => Promise<values.Value>) => any, call: (fn: values.VFn, args: values.Value[]) => Promise<values.Value>) {
 		if (id) utils.assertString(id);
@@ -513,7 +513,7 @@ export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: R
 			type,
 			id: _id,
 		});
-		components.push(component);
+		components.set(_id, component);
 		const instance = values.OBJ(new Map([
 			['id', values.STR(_id)],
 			['update', values.FN_NATIVE(([def], opts) => {
@@ -525,12 +525,12 @@ export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: R
 				}
 			})],
 		]));
-		instances[_id] = instance;
+		instances.set(_id, instance);
 		return instance;
 	}
 
 	const rootInstance = createComponentInstance('root', utils.jsToVal({ children: [] }), utils.jsToVal('___root___'), getRootOptions, () => {});
-	const rootComponent = components[0] as Ref<AsUiRoot>;
+	const rootComponent = components.get('___root___') as Ref<AsUiRoot>;
 	done(rootComponent);
 
 	return {
@@ -544,7 +544,7 @@ export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: R
 
 		'Ui:get': values.FN_NATIVE(([id], opts) => {
 			utils.assertString(id);
-			const instance = instances[id.value];
+			const instance = instances.get(id.value);
 			if (instance) {
 				return instance;
 			} else {
