@@ -8,26 +8,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<button v-if="copyButton" :class="$style.codeBlockCopyButton" class="_button" @click="copy">
 		<i class="ti ti-copy"></i>
 	</button>
-	<Suspense>
-		<template #fallback>
-			<MkLoading />
-		</template>
-		<XCode v-if="show && lang" :code="code" :lang="lang"/>
-		<pre v-else-if="show" :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
-		<button v-else :class="$style.codePlaceholderRoot" @click="show = true">
-			<div :class="$style.codePlaceholderContainer">
-				<div><i class="ti ti-code"></i> {{ i18n.ts.code }}</div>
-				<div>{{ i18n.ts.clickToShow }}</div>
-			</div>
-		</button>
-	</Suspense>
+	<XCode v-if="show && lang && loaded" :code="code" :lang="lang"/>
+	<pre v-else-if="show" :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
+	<button v-else :class="$style.codePlaceholderRoot" @click="show = true">
+		<div :class="$style.codePlaceholderContainer">
+			<div><i class="ti ti-code"></i> {{ i18n.ts.code }}</div>
+			<div>{{ i18n.ts.clickToShow }}</div>
+		</div>
+	</button>
 </div>
 </template>
 
 <script lang="ts" setup>
 import { defineAsyncComponent, ref } from 'vue';
 import * as os from '@/os.js';
-import MkLoading from '@/components/global/MkLoading.vue';
 import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { copyToClipboard } from '@/scripts/copy-to-clipboard.js';
@@ -43,8 +37,13 @@ const props = withDefaults(defineProps<{
 });
 
 const show = ref(props.forceShow === true ? true : !defaultStore.state.dataSaver.code);
+const loaded = ref(false);
 
-const XCode = defineAsyncComponent(() => import('@/components/MkCode.core.vue'));
+const XCode = props.lang ? defineAsyncComponent(
+	() => import('@/components/MkCode.core.vue').then(
+		(xcode) => ((loaded.value = true), xcode)
+	)
+) : undefined;
 
 function copy() {
 	copyToClipboard(props.code);
