@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <MkContainer :showHeader="widgetProps.showHeader" class="mkw-aiscriptApp">
 	<template #header>App</template>
 	<div :class="$style.root">
-		<MkAsUi v-if="root" :component="root" :components="components" size="small"/>
+		<MkAsUi :cid="'___root___'" :components="components" size="small"/>
 	</div>
 </MkContainer>
 </template>
@@ -51,18 +51,16 @@ const { widgetProps, configure } = useWidgetPropsManager(name,
 
 const parser = new Parser();
 
-const root = ref<AsUiRoot>();
-const components = ref<Ref<AsUiComponent>[]>([]);
+const components = ref<Map<string, Ref<AsUiComponent>>>(new Map());
 
 async function run() {
+	components.value.clear();
 	const aiscript = new Interpreter({
 		...createAiScriptEnv({
 			storageKey: 'widget',
 			token: $i?.token,
 		}),
-		...registerAsUiLib(components.value, (_root) => {
-			root.value = _root.value;
-		}),
+		...registerAsUiLib(components.value),
 	}, {
 		in: aiScriptReadline,
 		out: (value) => {

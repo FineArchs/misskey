@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<Transition :name="defaultStore.state.animation ? 'zoom' : ''" mode="out-in">
 					<div v-if="started" :class="$style.started">
 						<div class="main _panel">
-							<MkAsUi v-if="root" :component="root" :components="components"/>
+							<MkAsUi :cid="'___root___'" :components="components"/>
 						</div>
 						<div class="actions _panel">
 							<div class="items">
@@ -179,8 +179,7 @@ const parser = new Parser();
 
 const started = ref(false);
 const aiscript = shallowRef<Interpreter | null>(null);
-const root = ref<AsUiRoot>();
-const components = ref<Ref<AsUiComponent>[]>([]);
+const components = ref<Map<string, Ref<AsUiComponent>>>(new Map());
 
 function start() {
 	started.value = true;
@@ -190,14 +189,13 @@ function start() {
 async function run() {
 	if (aiscript.value) aiscript.value.abort();
 	if (!flash.value) return;
+	components.value.clear();
 
 	aiscript.value = new Interpreter({
 		...createAiScriptEnv({
 			storageKey: 'flash:' + flash.value.id,
 		}),
-		...registerAsUiLib(components.value, (_root) => {
-			root.value = _root.value;
-		}),
+		...registerAsUiLib(components.value),
 		THIS_ID: values.STR(flash.value.id),
 		THIS_URL: values.STR(`${url}/play/${flash.value.id}`),
 	}, {
