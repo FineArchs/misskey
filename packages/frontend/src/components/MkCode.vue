@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</button>
 	<Suspense v-else-if="lang">
 		<template #fallback>
-			<pre v-else :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
+			<pre :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
 		</template>
 		<XCode :code="code" :lang="lang"/>
 	</Suspense>
