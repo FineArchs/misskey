@@ -8,14 +8,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<button v-if="copyButton" :class="$style.codeBlockCopyButton" class="_button" @click="copy">
 		<i class="ti ti-copy"></i>
 	</button>
-	<XCode v-if="show && lang && loaded" :code="code" :lang="lang"/>
-	<pre v-else-if="show" :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
-	<button v-else :class="$style.codePlaceholderRoot" @click="show = true">
+	<button v-if="!show" :class="$style.codePlaceholderRoot" @click="show = true">
 		<div :class="$style.codePlaceholderContainer">
 			<div><i class="ti ti-code"></i> {{ i18n.ts.code }}</div>
 			<div>{{ i18n.ts.clickToShow }}</div>
 		</div>
 	</button>
+	<Suspense v-else-if="lang">
+		<template #fallback>
+			<pre v-else :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
+		</template>
+		<XCode :code="code" :lang="lang"/>
+	</Suspense>
+	<pre v-else :class="$style.codeBlockFallbackRoot"><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
 </div>
 </template>
 
