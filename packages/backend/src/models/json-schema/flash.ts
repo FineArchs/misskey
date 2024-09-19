@@ -34,26 +34,30 @@ export const packedFlashSchema = {
 		},
 		title: {
 			type: 'string',
-			optional: false, nullable: false,
+			optional: true, nullable: true,
 		},
 		summary: {
 			type: 'string',
-			optional: false, nullable: false,
+			optional: true, nullable: true,
 		},
 		script: {
 			type: 'string',
-			optional: false, nullable: false,
+			optional: true, nullable: true,
 		},
 		visibility: {
 			type: 'string',
 			optional: false, nullable: false,
-			enum: ['private', 'public'],
+			enum: ['private', 'urlonly', 'public'],
 		},
 		likedCount: {
 			type: 'number',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 		},
 		isLiked: {
+			type: 'boolean',
+			optional: true, nullable: false,
+		},
+		isHidden: {
 			type: 'boolean',
 			optional: true, nullable: false,
 		},
