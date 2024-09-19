@@ -22,6 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.visibility }}</template>
 				<template #caption>{{ i18n.ts._play.visibilityDescription }}</template>
 				<option :key="'public'" :value="'public'">{{ i18n.ts.public }}</option>
+				<option :key="'urlonly'" :value="'urlonly'">{{ i18n.ts.urlonly }}</option>
 				<option :key="'private'" :value="'private'">{{ i18n.ts.private }}</option>
 			</MkSelect>
 			<div class="_buttons">
@@ -379,7 +380,7 @@ if (props.id) {
 const title = ref(flash.value?.title ?? 'New Play');
 const summary = ref(flash.value?.summary ?? '');
 const permissions = ref(flash.value?.permissions ?? []);
-const visibility = ref<'private' | 'public'>(flash.value?.visibility ?? 'public');
+const visibility = ref<'private' | 'urlonly' | 'public'>(flash.value?.visibility ?? 'public');
 const script = ref(flash.value?.script ?? PRESET_DEFAULT);
 
 function selectPreset(ev: MouseEvent) {
