@@ -71,65 +71,6 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
-	private async hideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null) {
-		// TODO: isVisibleForMe を使うようにしても良さそう(型違うけど)
-		let hide = false;
-
-		// visibility が specified かつ自分が指定されていなかったら非表示
-		if (packedNote.visibility === 'specified') {
-			if (meId == null) {
-				hide = true;
-			} else if (meId === packedNote.userId) {
-				hide = false;
-			} else {
-				// 指定されているかどうか
-				const specified = packedNote.visibleUserIds!.some((id: any) => meId === id);
-
-				if (specified) {
-					hide = false;
-				} else {
-					hide = true;
-				}
-			}
-		}
-
-		// visibility が followers かつ自分が投稿者のフォロワーでなかったら非表示
-		if (packedNote.visibility === 'followers') {
-			if (meId == null) {
-				hide = true;
-			} else if (meId === packedNote.userId) {
-				hide = false;
-			} else if (packedNote.reply && (meId === packedNote.reply.userId)) {
-				// 自分の投稿に対するリプライ
-				hide = false;
-			} else if (packedNote.mentions && packedNote.mentions.some(id => meId === id)) {
-				// 自分へのメンション
-				hide = false;
-			} else {
-				// フォロワーかどうか
-				const isFollowing = await this.followingsRepository.exists({
-					where: {
-						followeeId: packedNote.userId,
-						followerId: meId,
-					},
-				});
-
-				hide = !isFollowing;
-			}
-		}
-
-		if (hide) {
-			packedNote.visibleUserIds = undefined;
-			packedNote.fileIds = [];
-			packedNote.files = [];
-			packedNote.text = null;
-			packedNote.poll = undefined;
-			packedNote.cw = null;
-			packedNote.isHidden = true;
-		}
-	}
-
-	@bindThis
 	private async populatePoll(note: MiNote, meId: MiUser['id'] | null) {
 		const poll = await this.pollsRepository.findOneByOrFail({ noteId: note.id });
 		const choices = poll.choices.map(c => ({
@@ -326,12 +267,9 @@ export class NoteEntityService implements OnModuleInit {
 			createdAt: this.idService.parse(note.id).date.toISOString(),
 			userId: note.userId,
 			user: packedUsers?.get(note.userId) ?? this.userEntityService.pack(note.user ?? note.userId, me),
-			text: text,
-			cw: note.cw,
 			visibility: note.visibility,
 			localOnly: note.localOnly,
 			reactionAcceptance: note.reactionAcceptance,
-			visibleUserIds: note.visibility === 'specified' ? note.visibleUserIds : undefined,
 			renoteCount: note.renoteCount,
 			repliesCount: note.repliesCount,
 			reactionCount: Object.values(note.reactions).reduce((a, b) => a + b, 0),
@@ -340,8 +278,6 @@ export class NoteEntityService implements OnModuleInit {
 			reactionAndUserPairCache: opts.withReactionAndUserPairCache ? note.reactionAndUserPairCache : undefined,
 			emojis: host != null ? this.customEmojiService.populateEmojis(note.emojis, host) : undefined,
 			tags: note.tags.length > 0 ? note.tags : undefined,
-			fileIds: note.fileIds,
-			files: packedFiles != null ? this.packAttachedFiles(note.fileIds, packedFiles) : this.driveFileEntityService.packManyByIds(note.fileIds),
 			replyId: note.replyId,
 			renoteId: note.renoteId,
 			channelId: note.channelId ?? undefined,
@@ -374,17 +310,30 @@ export class NoteEntityService implements OnModuleInit {
 					_hint_: options?._hint_,
 				}) : undefined,
 
-				poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
-
 				...(meId && Object.keys(note.reactions).length > 0 ? {
 					myReaction: this.populateMyReaction(note, meId, options?._hint_),
 				} : {}),
 			} : {}),
+			
+			...(opts.skipHide || this.isVisibleForMe(meId, note) ? {
+				visibleUserIds: note.visibility === 'specified' ? note.visibleUserIds : undefined,
+				fileIds: note.fileIds,
+				files: packedFiles != null ? this.packAttachedFiles(note.fileIds, packedFiles) : this.driveFileEntityService.packManyByIds(note.fileIds),
+				text: text,
+				cw: note.cw,
+				...(opts.detail ? {
+					poll: note.hasPoll ? this.populatePoll(note, meId) : undefined,
+				}),
+			} : {
+				isHidden: true,
+				visibleUserIds: undefined,
+				fileIds: [],
+				files: [],
+				text: null,
+				cw: null,
+				poll: undefined,
+			}),
 		});
-
-		if (!opts.skipHide) {
-			await this.hideNote(packed, meId);
-		}
 
 		return packed;
 	}
