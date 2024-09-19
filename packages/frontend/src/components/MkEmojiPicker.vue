@@ -21,7 +21,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<!-- FirefoxのTabフォーカスが想定外の挙動となるためtabindex="-1"を追加 https://github.com/misskey-dev/misskey/issues/10744 -->
 	<div ref="emojisEl" class="emojis" tabindex="-1">
 		<section class="result">
-			<div v-if="searchResultCustom.length > 0" class="body">
+			<div :class="$styles.tabs">
+				<div @click="emojiTab = 'custom'">{{ i18n.ts.emojitabCustom }}</div>
+				<div @click="emojiTab = 'unicode'">{{ i18n.ts.emojitabUnicode }}</div>
+			</div>
+			<div v-if="emojiTab = 'custom' && searchResultCustom.length > 0" class="body">
 				<button
 					v-for="emoji in searchResultCustom"
 					:key="emoji.name"
@@ -34,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkCustomEmoji class="emoji" :name="emoji.name" :fallbackToImage="true"/>
 				</button>
 			</div>
-			<div v-if="searchResultUnicode.length > 0" class="body">
+			<div v-if="emojiTab = 'unicode' && searchResultUnicode.length > 0" class="body">
 				<button
 					v-for="emoji in searchResultUnicode"
 					:key="emoji.name"
@@ -179,6 +183,7 @@ const q = ref<string>('');
 const searchResultCustom = ref<Misskey.entities.EmojiSimple[]>([]);
 const searchResultUnicode = ref<UnicodeEmojiDef[]>([]);
 const tab = ref<'index' | 'custom' | 'unicode' | 'tags'>('index');
+const emojiTab = ref<'custom' | 'unicode'>('custom')
 
 const customEmojiFolderRoot: CustomEmojiFolderTree = { value: '', category: '', children: [] };
 
