@@ -44,7 +44,7 @@ export const paramDef = {
 		permissions: { type: 'array', items: {
 			type: 'string',
 		} },
-		visibility: { type: 'string', enum: ['public', 'private'], default: 'public' },
+		visibility: { type: 'string', enum: ['public', 'urlonly', 'private'], default: 'public' },
 	},
 	required: ['title', 'summary', 'script', 'permissions'],
 } as const;
