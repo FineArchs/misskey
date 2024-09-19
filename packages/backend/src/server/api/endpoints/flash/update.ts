@@ -49,7 +49,7 @@ export const paramDef = {
 		permissions: { type: 'array', items: {
 			type: 'string',
 		} },
-		visibility: { type: 'string', enum: ['public', 'private'] },
+		visibility: { type: 'string', enum: ['public', 'urlonly', 'private'] },
 	},
 	required: ['flashId'],
 } as const;
