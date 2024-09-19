@@ -58,10 +58,11 @@ export class MiFlash {
 
 	/**
 	 * public ... 公開
-	 * private ... プロフィールには表示しない
+	 * urlonly ... プロフィールには表示しない
+	 * private ... 非公開
 	 */
 	@Column('varchar', {
 		length: 512, default: 'public',
 	})
-	public visibility: 'public' | 'private';
+	public visibility: 'public' | 'urlonly' | 'private';
 }
