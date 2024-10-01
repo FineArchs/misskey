@@ -14,8 +14,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<XStatusBars :class="$style.statusbars"/>
 			</div>
 		</template>
+
 		<RouterView/>
 		<div :class="$style.spacer"></div>
+
+		<template #footer>
+			<div v-if="isMobile" :class="$style.nav">
+				<button :class="$style.navButton" class="_button" @click="drawerMenuShowing = true"><i :class="$style.navButtonIcon" class="ti ti-menu-2"></i><span v-if="menuIndicated" :class="$style.navButtonIndicator"><i class="_indicatorCircle"></i></span></button>
+				<button :class="$style.navButton" class="_button" @click="isRoot ? top() : mainRouter.push('/')"><i :class="$style.navButtonIcon" class="ti ti-home"></i></button>
+				<button :class="$style.navButton" class="_button" @click="mainRouter.push('/my/notifications')">
+					<i :class="$style.navButtonIcon" class="ti ti-bell"></i>
+					<span v-if="$i?.hasUnreadNotification" :class="$style.navButtonIndicator">
+						<span class="_indicateCounter" :class="$style.itemIndicateValueIcon">{{ $i.unreadNotificationsCount > 99 ? '99+' : $i.unreadNotificationsCount }}</span>
+					</span>
+				</button>
+				<button :class="$style.navButton" class="_button" @click="widgetsShowing = true"><i :class="$style.navButtonIcon" class="ti ti-apps"></i></button>
+				<button :class="$style.postButton" class="_button" @click="os.post()"><i :class="$style.navButtonIcon" class="ti ti-pencil"></i></button>
+			</div>
+		</template>
 	</MkStickyContainer>
 
 	<div v-if="isDesktop && !pageMetadata?.needWideArea" :class="$style.widgets">
@@ -24,18 +40,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<button v-if="(!isDesktop || pageMetadata?.needWideArea) && !isMobile" :class="$style.widgetButton" class="_button" @click="widgetsShowing = true"><i class="ti ti-apps"></i></button>
 
-	<div v-if="isMobile" ref="navFooter" :class="$style.nav">
-		<button :class="$style.navButton" class="_button" @click="drawerMenuShowing = true"><i :class="$style.navButtonIcon" class="ti ti-menu-2"></i><span v-if="menuIndicated" :class="$style.navButtonIndicator"><i class="_indicatorCircle"></i></span></button>
-		<button :class="$style.navButton" class="_button" @click="isRoot ? top() : mainRouter.push('/')"><i :class="$style.navButtonIcon" class="ti ti-home"></i></button>
-		<button :class="$style.navButton" class="_button" @click="mainRouter.push('/my/notifications')">
-			<i :class="$style.navButtonIcon" class="ti ti-bell"></i>
-			<span v-if="$i?.hasUnreadNotification" :class="$style.navButtonIndicator">
-				<span class="_indicateCounter" :class="$style.itemIndicateValueIcon">{{ $i.unreadNotificationsCount > 99 ? '99+' : $i.unreadNotificationsCount }}</span>
-			</span>
-		</button>
-		<button :class="$style.navButton" class="_button" @click="widgetsShowing = true"><i :class="$style.navButtonIcon" class="ti ti-apps"></i></button>
-		<button :class="$style.postButton" class="_button" @click="os.post()"><i :class="$style.navButtonIcon" class="ti ti-pencil"></i></button>
-	</div>
 
 	<Transition
 		:enterActiveClass="defaultStore.state.animation ? $style.transition_menuDrawerBg_enterActive : ''"
@@ -132,7 +136,6 @@ window.addEventListener('resize', () => {
 
 const pageMetadata = ref<null | PageMetadata>(null);
 const widgetsShowing = ref(false);
-const navFooter = shallowRef<HTMLElement>();
 const contents = shallowRef<InstanceType<typeof MkStickyContainer>>();
 
 provide('router', mainRouter);
@@ -219,23 +222,6 @@ function top() {
 	});
 }
 
-const navFooterHeight = ref(0);
-provide<Ref<number>>(CURRENT_STICKY_BOTTOM, navFooterHeight);
-
-watch(navFooter, () => {
-	if (navFooter.value) {
-		navFooterHeight.value = navFooter.value.offsetHeight;
-		document.body.style.setProperty('--stickyBottom', `${navFooterHeight.value}px`);
-		document.body.style.setProperty('--minBottomSpacing', 'var(--minBottomSpacingMobile)');
-	} else {
-		navFooterHeight.value = 0;
-		document.body.style.setProperty('--stickyBottom', '0px');
-		document.body.style.setProperty('--minBottomSpacing', '0px');
-	}
-}, {
-	immediate: true,
-});
-
 useScrollPositionManager(() => contents.value.rootEl, mainRouter);
 </script>
 
@@ -249,6 +235,10 @@ body {
 	top: 0;
 	left: 0;
 	overscroll-behavior: none;
+}
+
+body {
+	--minBottomSpacing: v-bind("isMobile ? 'var(--minBottomSpacingMobile)' : '0px'");
 }
 
 #misskey_app {
@@ -323,7 +313,7 @@ $widgets-hide-threshold: 1090px;
 
 .contents {
 	flex: 1;
-	height: 100%;
+	height: 100vh;
 	min-width: 0;
 	overflow: auto;
 	overflow-y: scroll;
@@ -390,10 +380,7 @@ $widgets-hide-threshold: 1090px;
 }
 
 .nav {
-	position: fixed;
 	z-index: 1000;
-	bottom: 0;
-	left: 0;
 	padding: 12px 12px max(12px, env(safe-area-inset-bottom, 0px)) 12px;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
