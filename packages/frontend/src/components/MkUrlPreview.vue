@@ -170,7 +170,7 @@ if (self && requestUrl.pathname.startsWith('/notes/')) {
 }
 
 function onExpandNote() {
-	noteRecord[noteId] = misskeyApi('notes/show', {
+	noteRecord.value[noteId.value] = misskeyApi('notes/show', {
 		noteId: noteId.value,
 	});
 	tweetExpanded.value = true;
