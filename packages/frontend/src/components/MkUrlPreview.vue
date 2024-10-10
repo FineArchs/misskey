@@ -43,6 +43,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkButton>
 	</div>
 </template>
+<template v-else-if="noteId && tweetExpanded">
+	<div :class="$style.quote">
+		<MkNoteSimple :note="noteRecord[noteId]" :class="$style.quoteNote"/>
+	</div>
+	<div :class="$style.action">
+		<MkButton :small="true" inline @click="tweetExpanded = false">
+			<i class="ti ti-x"></i> {{ i18n.ts.close }}
+		</MkButton>
+	</div>
+</template>
 <div v-else>
 	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="self ? url.substring(local.length) : url" rel="nofollow noopener" :target="target" :title="url">
 		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="defaultStore.state.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
@@ -70,6 +80,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i class="ti ti-brand-x"></i> {{ i18n.ts.expandTweet }}
 			</MkButton>
 		</div>
+		<div v-if="noteId" :class="$style.action">
+			<MkButton :small="true" inline @click="onExpandNote()">
+				<i class="ti ti-eye"></i> {{ i18n.ts.expandNote }}
+			</MkButton>
+		</div>
 		<div v-if="!playerEnabled && player.url" :class="$style.action">
 			<MkButton :small="true" inline @click="playerEnabled = true">
 				<i class="ti ti-player-play"></i> {{ i18n.ts.enablePlayer }}
@@ -84,12 +99,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import type { summaly } from '@misskey-dev/summaly';
 import { url as local } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@/scripts/device-kind.js';
+import { misskeyApi } from '@/scripts/misskey-api.js';
 import MkButton from '@/components/MkButton.vue';
+import MkNoteSimple from '@/components/MkNoteSimple.vue';
 import { versatileLang } from '@@/js/intl-const.js';
 import { transformPlayerUrl } from '@/scripts/player-url-transform.js';
 import { defaultStore } from '@/store.js';
@@ -127,7 +145,9 @@ const player = ref({
 } as SummalyResult['player']);
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
-const tweetExpanded = ref(props.detail);
+const noteId = ref<string | null>(null);
+const noteRecord = ref<Record<string, Misskey.entities.Note>>({});
+const tweetExpanded = ref(props.detail); // noteと兼用
 const embedId = `embed${Math.random().toString().replace(/\D/, '')}`;
 const tweetHeight = ref(150);
 const unknownUrl = ref(false);
@@ -142,6 +162,18 @@ if (!['http:', 'https:'].includes(requestUrl.protocol)) throw new Error('invalid
 if (requestUrl.hostname === 'twitter.com' || requestUrl.hostname === 'mobile.twitter.com' || requestUrl.hostname === 'x.com' || requestUrl.hostname === 'mobile.x.com') {
 	const m = requestUrl.pathname.match(/^\/.+\/status(?:es)?\/(\d+)/);
 	if (m) tweetId.value = m[1];
+}
+
+if (self && requestUrl.pathname.startsWith('/notes/')) {
+	const m = requestUrl.pathname.match(/^\/notes\/(\w+)$/);
+	if (m) noteId.value = m[1];
+}
+
+async function onExpandNote() {
+	noteRecord.value[noteId.value] = await misskeyApi('notes/show', {
+		noteId: noteId.value,
+	});
+	tweetExpanded.value = true;
 }
 
 if (requestUrl.hostname === 'music.youtube.com' && requestUrl.pathname.match('^/(?:watch|channel)')) {
@@ -328,6 +360,17 @@ onUnmounted(() => {
 	gap: 6px;
 	flex-wrap: wrap;
 	margin-top: 6px;
+}
+
+.quote {
+	padding: 8px 0;
+}
+
+.quoteNote {
+	padding: 16px;
+	border: dashed 1px var(--MI_THEME-renote);
+	border-radius: 8px;
+	overflow: clip;
 }
 
 @container (max-width: 400px) {
