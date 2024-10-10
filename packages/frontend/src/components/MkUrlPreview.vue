@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <template v-else-if="noteId && tweetExpanded">
 	<div :class="$style.quote">
-		<MkNoteSimple :note="noteRecord.value[noteId]" :class="$style.quoteNote"/>
+		<MkNoteSimple :note="noteRecord[noteId]" :class="$style.quoteNote"/>
 	</div>
 	<div :class="$style.action">
 		<MkButton :small="true" inline @click="tweetExpanded = false">
@@ -169,8 +169,8 @@ if (self && requestUrl.pathname.startsWith('/notes/')) {
 	if (m) noteId.value = m[1];
 }
 
-function onExpandNote() {
-	noteRecord.value[noteId.value] = misskeyApi('notes/show', {
+async function onExpandNote() {
+	noteRecord.value[noteId.value] = await misskeyApi('notes/show', {
 		noteId: noteId.value,
 	});
 	tweetExpanded.value = true;
