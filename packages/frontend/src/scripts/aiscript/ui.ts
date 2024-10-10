@@ -34,6 +34,11 @@ export type AsUiContainer = AsUiComponentBase & {
 	hidden?: boolean;
 };
 
+export type AsUiPopup = AsUiComponentBase & {
+	type: 'popup';
+	children: AsUiComponent['id'][];
+};
+
 export type AsUiText = AsUiComponentBase & {
 	type: 'text';
 	text?: string;
@@ -202,6 +207,20 @@ function getContainerOptions(def: values.Value | undefined): Omit<AsUiContainer,
 		padding: padding?.value,
 		rounded: rounded?.value,
 		hidden: hidden?.value,
+	};
+}
+
+function getPopupOptions(def: values.Value | undefined): Omit<AsUiPopup, 'id' | 'type'> {
+	utils.assertObject(def);
+
+	const children = def.value.get('children');
+	utils.assertArray(children);
+
+	return {
+		children: children.value.map(v => {
+			utils.assertObject(v);
+			return v.value.get('id').value;
+		}),
 	};
 }
 
@@ -539,10 +558,14 @@ export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: R
 
 	const rootInstance = createComponentInstance('root', utils.jsToVal({ children: [] }), utils.jsToVal('___root___'), getRootOptions, () => {});
 	const rootComponent = components[0] as Ref<AsUiRoot>;
+	const popupInstances = values.ARR([]);
+	const popupComponents = 
 	done(rootComponent);
 
 	return {
 		'Ui:root': rootInstance,
+
+		'Ui:popups': popupInstances,
 
 		'Ui:patch': values.FN_NATIVE(([id, val], opts) => {
 			utils.assertString(id);
@@ -562,6 +585,15 @@ export function registerAsUiLib(components: Ref<AsUiComponent>[], done: (root: R
 
 		// Ui:root.update({ children: [...] }) の糖衣構文
 		'Ui:render': values.FN_NATIVE(([children], opts) => {
+			utils.assertArray(children);
+
+			rootComponent.value.children = children.value.map(v => {
+				utils.assertObject(v);
+				return v.value.get('id').value;
+			});
+		}),
+
+		'Ui:popup': values.FN_NATIVE(([children], opts) => {
 			utils.assertArray(children);
 
 			rootComponent.value.children = children.value.map(v => {
