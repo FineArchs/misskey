@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <template v-else-if="noteId && tweetExpanded">
 	<div :class="$style.quote">
-		<MkNoteSimple :note="getNote(noteId)" :class="$style.quoteNote"/>
+		<MkNoteSimple :note="noteRecord.value[noteId]" :class="$style.quoteNote"/>
 	</div>
 	<div :class="$style.action">
 		<MkButton :small="true" inline @click="tweetExpanded = false">
@@ -81,7 +81,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkButton>
 		</div>
 		<div v-if="noteId" :class="$style.action">
-			<MkButton :small="true" inline @click="tweetExpanded = true">
+			<MkButton :small="true" inline @click="onExpandNote()">
 				<i class="ti ti-eye"></i> {{ i18n.ts.expandNote }}
 			</MkButton>
 		</div>
@@ -99,6 +99,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import type { summaly } from '@misskey-dev/summaly';
 import { url as local } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
@@ -145,6 +146,7 @@ const player = ref({
 const playerEnabled = ref(false);
 const tweetId = ref<string | null>(null);
 const noteId = ref<string | null>(null);
+const noteRecord = ref<Record<string, Misskey.entities.Note>>({});
 const tweetExpanded = ref(props.detail); // noteと兼用
 const embedId = `embed${Math.random().toString().replace(/\D/, '')}`;
 const tweetHeight = ref(150);
@@ -167,10 +169,11 @@ if (self && requestUrl.pathname.startsWith('/notes/')) {
 	if (m) noteId.value = m[1];
 }
 
-function getNote(id: string) {
-	return misskeyApi('notes/show', {
+function onExpandNote() {
+	noteRecord[noteId] = misskeyApi('notes/show', {
 		noteId: noteId.value,
 	});
+	tweetExpanded.value = true;
 }
 
 if (requestUrl.hostname === 'music.youtube.com' && requestUrl.pathname.match('^/(?:watch|channel)')) {
