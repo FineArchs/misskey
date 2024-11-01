@@ -210,7 +210,7 @@ customEmojiCategories.value.forEach(ec => {
 parseAndMergeCategories('', customEmojiFolderRoot);
 
 watch(q, () => {
-	if (emojisEl.value) emojisEl.value.scrollTop = 0;
+	// if (emojisEl.value) emojisEl.value.scrollTop = 0;
 
 	if (q.value === '') {
 		searchResultCustom.value = [];
