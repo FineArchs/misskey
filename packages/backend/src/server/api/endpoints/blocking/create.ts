@@ -115,7 +115,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 				case 'BLOCKEE_IS_MODERATOR': throw new ApiError(meta.errors.blockeeIsModerator);
 				// 網羅性チェック
-				default: error satisfies never;
+				default: throw new Error(error satisfies never);
 			}
 		});
 	}
