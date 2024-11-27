@@ -60,7 +60,10 @@ export class UserBlockingService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async block(blocker: MiUser, blockee: MiUser, silent = false): null | 'BLOCKEE_IS_MODERATOR' {
+	public async block(blocker: MiUser, blockee: MiUser, silent = false): Promise<
+		| null
+		| 'BLOCKEE_IS_MODERATOR'
+	> {
 		if (await this.roleService.isModerator(blockee)) return 'BLOCKEE_IS_MODERATOR';
 		await Promise.all([
 			this.cancelRequest(blocker, blockee, silent),
