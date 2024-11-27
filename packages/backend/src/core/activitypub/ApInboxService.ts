@@ -357,8 +357,11 @@ export class ApInboxService {
 			return 'skip: ブロックしようとしているユーザーはローカルユーザーではありません';
 		}
 
-		await this.userBlockingService.block(await this.usersRepository.findOneByOrFail({ id: actor.id }), await this.usersRepository.findOneByOrFail({ id: blockee.id }));
-		return 'ok';
+		const error = await this.userBlockingService.block(await this.usersRepository.findOneByOrFail({ id: actor.id }), await this.usersRepository.findOneByOrFail({ id: blockee.id }));
+		switch (error) {
+			case null: return 'ok';
+			case 'BLOCKEE_IS_MODERATOR': return 'skip: Blocking Moderator is not allowed.';
+		}
 	}
 
 	@bindThis
