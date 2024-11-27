@@ -20,6 +20,7 @@ import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
 import { UserFollowingService } from '@/core/UserFollowingService.js';
+import { RoleService } from '@/core/RoleService.js';
 
 @Injectable()
 export class UserBlockingService implements OnModuleInit {
@@ -49,6 +50,7 @@ export class UserBlockingService implements OnModuleInit {
 		private webhookService: UserWebhookService,
 		private apRendererService: ApRendererService,
 		private loggerService: LoggerService,
+		private roleService: RoleService,
 	) {
 		this.logger = this.loggerService.getLogger('user-block');
 	}
@@ -58,7 +60,8 @@ export class UserBlockingService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async block(blocker: MiUser, blockee: MiUser, silent = false) {
+	public async block(blocker: MiUser, blockee: MiUser, silent = false): null | 'BLOCKEE_IS_MODERATOR' {
+		if (await this.roleService.isModerator(blockee)) return 'BLOCKEE_IS_MODERATOR';
 		await Promise.all([
 			this.cancelRequest(blocker, blockee, silent),
 			this.cancelRequest(blockee, blocker, silent),
@@ -89,6 +92,8 @@ export class UserBlockingService implements OnModuleInit {
 			const content = this.apRendererService.addContext(this.apRendererService.renderBlock(blocking));
 			this.queueService.deliver(blocker, content, blockee.inbox, false);
 		}
+
+		return null;
 	}
 
 	@bindThis

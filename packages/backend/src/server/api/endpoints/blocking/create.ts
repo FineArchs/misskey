@@ -43,6 +43,12 @@ export const meta = {
 			code: 'ALREADY_BLOCKING',
 			id: '787fed64-acb9-464a-82eb-afbd745b9614',
 		},
+
+		blockeeIsModerator: {
+			message: 'Blocking Moderator is not allowed.',
+			code: 'BLOCKEE_IS_MODERATOR',
+			id: '3dca06d1-5ee8-4f14-aff1-917e9ba35e05',
+		},
 	},
 
 	res: {
@@ -99,11 +105,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.alreadyBlocking);
 			}
 
-			await this.userBlockingService.block(blocker, blockee);
+			const error = await this.userBlockingService.block(blocker, blockee);
 
-			return await this.userEntityService.pack(blockee.id, blocker, {
-				schema: 'UserDetailedNotMe',
-			});
+			switch (error) {
+				case null: {
+					return await this.userEntityService.pack(blockee.id, blocker, {
+						schema: 'UserDetailedNotMe',
+					});
+				}
+				case 'BLOCKEE_IS_MODERATOR': throw new ApiError(meta.errors.blockeeIsModerator);
+				// 網羅性チェック
+				default: error satisfies never;
+			}
 		});
 	}
 }

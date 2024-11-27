@@ -61,8 +61,11 @@ export class RelationshipProcessorService {
 			this.usersRepository.findOneByOrFail({ id: job.data.from.id }),
 			this.usersRepository.findOneByOrFail({ id: job.data.to.id }),
 		]);
-		await this.userBlockingService.block(blockee, blocker, job.data.silent);
-		return 'ok';
+		const error = await this.userBlockingService.block(blockee, blocker, job.data.silent);
+		switch (error) {
+			case null: return 'ok';
+			case 'BLOCKEE_IS_MODERATOR': return 'skip: Blocking Moderator is not allowed.';
+		}
 	}
 
 	@bindThis
