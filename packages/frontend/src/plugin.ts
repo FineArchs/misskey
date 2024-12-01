@@ -16,7 +16,12 @@ export const pluginLogs = ref(new Map<string, string[]>());
 export async function install(plugin: Plugin): Promise<void> {
 	// 後方互換性のため
 	if (plugin.src == null) return;
-
+	
+	pluginLogs.value.set(plugin.id, []);
+	function log(mes: string): void {
+		pluginLogs.value.get(plugin.id).push(mes);
+	}
+		
 	const aiscript = new Interpreter(createPluginEnv({
 		plugin: plugin,
 		storageKey: 'plugins:' + plugin.id,
@@ -24,24 +29,26 @@ export async function install(plugin: Plugin): Promise<void> {
 		in: aiScriptReadline,
 		out: (value): void => {
 			console.log(value);
-			pluginLogs.value.get(plugin.id).push(utils.reprValue(value));
+			log(utils.reprValue(value));
 		},
 		log: (): void => {
 		},
 		err: (err): void => {
-			pluginLogs.value.get(plugin.id).push(`${err}`);
+			log(`${err}`);
 			throw err; // install時のtry-catchに反応させる
 		},
 	});
 
-	initPlugin({ plugin, aiscript });
+	pluginContexts.set(plugin.id, aiscript);
 
 	aiscript.exec(parser.parse(plugin.src)).then(
 		() => {
 			console.info('Plugin installed:', plugin.name, 'v' + plugin.version);
+			log('Plugin installed.');
 		},
 		(err) => {
 			console.error('Plugin install failed:', plugin.name, 'v' + plugin.version);
+			log('Plugin install failed.');
 			throw err;
 		},
 	);
@@ -96,11 +103,6 @@ function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Record<s
 		}),
 		'Plugin:config': values.OBJ(config),
 	};
-}
-
-function initPlugin({ plugin, aiscript }): void {
-	pluginContexts.set(plugin.id, aiscript);
-	pluginLogs.value.set(plugin.id, []);
 }
 
 function registerPostFormAction({ pluginId, title, handler }): void {
