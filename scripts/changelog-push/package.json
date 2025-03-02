@@ -1,0 +1,21 @@
+{
+  "name": "changelog-push",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "github automations",
+  "scripts": {
+    "run": "vite-node src/run.ts",
+    "push": "vite-node src/run.ts -w",
+    "validate": "vite-node src/run.ts -s",
+    "test": "tsc && vitest run"
+  },
+  "dependencies": {
+    "vite-node": "^3.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}
