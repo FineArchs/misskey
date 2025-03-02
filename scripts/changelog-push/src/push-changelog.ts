@@ -240,12 +240,13 @@ function addItem(base: ParsedItem[], newKind: string): ParsedItem {
 		return newItem;
 	}
 
+	if (base.length === 0) return addAt(0);
 	if (newKind === '') return addAt(base.length);
 
 	const pi = priorItemKinds.indexOf(newKind as any);
 
 	// prior itemではないなら末尾に追加
-	if (pi === -1) return addAt(base.length - (base.at(-1).kind === '' ? -1 : base.length));
+	if (pi === -1) return addAt(base.length - (base.at(-1)!.kind === '' ? -1 : base.length));
 
 	// より上位のprior itemがあればその次に追加
 	for (const jbKind of priorItemKinds.slice(0, pi).reverse()) {
