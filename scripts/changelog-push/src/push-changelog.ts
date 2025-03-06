@@ -19,11 +19,13 @@
  * Item = "- " + ItemKind + Content
  */
 
+import { parseBase, parseInsertion } from './parse.js';
+import type { ParsedClause, StrictParsedClause, ParsedItem, StrictParsedItem } from './parse.js';
 
-const priorClauseKinds = ['Note', 'General', 'Client', 'Server', 'Misskey.js'] as const;
-type PriorClauseKinds = typeof priorClauseKinds[number];
-const priorItemKinds = ['Feat', 'Enhance', 'Fix'] as const;
-type PriorItemKinds = typeof priorItemKinds[number];
+export const priorClauseKinds = ['Note', 'General', 'Client', 'Server', 'Misskey.js'] as const;
+export type PriorClauseKinds = typeof priorClauseKinds[number];
+export const priorItemKinds = ['Feat', 'Enhance', 'Fix'] as const;
+export type PriorItemKinds = typeof priorItemKinds[number];
 /*
 const legacyClauseKinds = ['Changes', 'Service Worker', 'Improvements', 'Bugfixes', 'TL;DR', 'Notable features', 'Special thanks', 'Known issues', 'Features'];
 const legacySubClauseKinds = ['For server admins', 'For users', 'For app developers'];
@@ -34,7 +36,9 @@ export function pushChangeLog(base: string, insertion: string): string {
 	const { before, header, body, after } = splitByFirstRelease(base);
 	const parsedB = parseBase(body);
 	const parsedI = parseInsertion(insertion);
+	//console.log(JSON.stringify(parsedB, null, 2));
 	insert(parsedB, parsedI);
+	//console.log(stringifyClauses(parsedB));
 	return before + header + stringifyClauses(parsedB) + after;
 }
 
@@ -67,127 +71,10 @@ export function splitByFirstRelease(base: string): {
 	return { before, header, body, after };
 }
 
-type ParsedClause = {
-	kind: string | null,
-	items: ParsedItem[],
-};
-type ParsedItem = {
-	kind: string | null,
-	text: string,
-};
-
-// Compared to parseInsertion, parseBase is designed to be lossless and format error tolerant.
-function parseBase(clausesText: string): ParsedClause[] {
-	const lines = clausesText.split('\n');
-	const result: ParsedClause[] = [];
-
-	for (const line of lines) {
-		const lastItem = result.length > 0 ? result.at(-1)!.items.at(-1) : null;
-
-		function newItem(kind: string | null): void {
-			if (result.length === 0) result.push({ kind: null, items: [] });
-			result.at(-1)!.items.push({ kind, text: line });
-		}
-		function continueItem(kind?: string | null): void {
-			if (lastItem == null) newItem(kind ?? null);
-			else if (kind === undefined) {
-				if (lastItem.kind === ' ') newItem(null);
-				else lastItem.text += `\n${line}`;
-			}
-			else if (lastItem.kind !== kind) newItem(kind);
-			else lastItem.text += `\n${line}`;
-		}
-
-		if (line.startsWith('### ')) {
-			result.push({ kind: line.slice(4), items: [] });
-			continue;
-		}
-		if (line.startsWith('- ')) {
-			const itemKind = line.match(/^- ([\w +-\/()]+?): /)?.[1] ?? '';
-			continueItem(itemKind);
-			continue;
-		}
-		// 空行はまとめる
-		if (line.trim() === '') continueItem(' ');
-		// 空行でなければ前itemの続きとみなす
-		else continueItem();
-	}
-	return result;
-}
-
-type StrictParsedClause = {
-	kind: string,
-	items: StrictParsedItem[],
-};
-type StrictParsedItem = {
-	kind: string,
-	text: string,
-};
-
-function parseInsertion(itemsText: string): StrictParsedClause[] {
-	const lines = itemsText.replaceAll(/<!--.*?-->/g, '').split('\n');
-	const resultMap = new Map<string, Map<string, string>>();
-	let clauseKind: null | string = null;
-	let pendingItem: null | { itemKind: string, content: string } = null;
-
-	function commitPendingItem() {
-		if (pendingItem == null) return;
-		if (clauseKind == null) throw new Error('clauseKind required (delayed detection): \n' + pendingItem);
-		if (!resultMap.has(clauseKind)) resultMap.set(clauseKind, new Map());
-
-		const tmp = resultMap.get(clauseKind)!;
-		const itemKind = pendingItem.itemKind;
-		const existingItem = tmp.get(itemKind);
-		const newItem = pendingItem.content.trimEnd();
-		// items of the same clauseKind and itemKind are concatenated here
-		tmp.set(itemKind, existingItem ? `${existingItem}\n${newItem}` : newItem);
-		pendingItem = null;
-	}
-
-	for (const [lineI, line] of lines.entries()) {
-		const errmes = (mes: string) => `${mes} (at line ${lineI + 1}: \n\t${line}`;
-
-		if (line.trim() === '') {
-			if (pendingItem != null) pendingItem.content += `\n${line}`;
-			continue;
-		}
-		if (line.startsWith('  ')) {
-			if (pendingItem == null) throw new Error(errmes('invalid indent'));
-			pendingItem.content += `\n${line}`;
-			continue;
-		}
-		 
-		commitPendingItem();
-
-		if (line.startsWith('### ')) {
-			clauseKind = line.slice(4);
-			continue;
-		}
-		if (line.startsWith('- ')) {
-			if (clauseKind == null) throw new Error(errmes('clauseKind required'));
-			const itemKind = line.match(/^- ([\w +-\/()]+?): /)?.[1] ?? '';
-			pendingItem = { content: line, itemKind };
-			continue;
-		}
-
-		throw new Error(errmes('invalid line'));
-	}
-	commitPendingItem();
-
-	return [...resultMap.entries()].map(
-		([kind, itemMap]) => ({
-			kind,
-			items: [...itemMap.entries()].map(
-				([kind, text]) => ({ kind, text })
-			)
-		})
-	);
-}
-
 // baseを改変するので注意
 function insert(base: ParsedClause[], insertion: StrictParsedClause[]): void {
-	const leadingEmptyLines = (base[0]?.kind === ' ') ? base.shift() : null;
-	const trailingEmptyLines = (base.at(-1)?.kind === ' ') ? base.pop() : null;
+	const leadingEmptyLines = (base[0]?.kind === 'empty') ? base.shift() : null;
+	const trailingEmptyLines = (base.at(-1)?.kind === 'empty') ? base.pop() : null;
 
 	for (const clause of insertion) {
 		const baseClause = addClause(base, clause.kind);
@@ -203,7 +90,7 @@ function insert(base: ParsedClause[], insertion: StrictParsedClause[]): void {
 }
 
 // 前後に空白のclauseがある場合は一時的に除いておくとよい
-function addClause(base: ParsedClause[], newKind: string): ParsedClause {
+function addClause(base: ParsedClause[], newKind: StrictParsedClause['kind']): ParsedClause {
 	// すでに該当のclauseがあればそれを返す
 	const foundClause = base.find(v => v.kind === newKind);
 	if (foundClause != null) return foundClause;
@@ -229,7 +116,7 @@ function addClause(base: ParsedClause[], newKind: string): ParsedClause {
 	return addAt(0);
 }
 
-function addItem(base: ParsedItem[], newKind: string): ParsedItem {
+function addItem(base: ParsedItem[], newKind: StrictParsedItem['kind']): ParsedItem {
 	// すでに該当のitemがあればそれを返す
 	const foundItem = base.find(v => v.kind === newKind);
 	if (foundItem != null) return foundItem;
@@ -241,9 +128,9 @@ function addItem(base: ParsedItem[], newKind: string): ParsedItem {
 	}
 
 	if (base.length === 0) return addAt(0);
-	if (newKind === '') return addAt(base.length);
+	if (newKind === 'nokind') return addAt(base.length);
 
-	const pi = priorItemKinds.indexOf(newKind as any);
+	const pi = priorItemKinds.indexOf(newKind.slice(6) as any);
 
 	// prior itemではないなら末尾に追加
 	if (pi === -1) return addAt(base.length - (base.at(-1)!.kind === '' ? -1 : base.length));

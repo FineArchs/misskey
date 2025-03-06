@@ -8,7 +8,7 @@
 ```md
 ```
 #### 追加後
-```md
+```diff
 ```
 
 ### Unreleased
@@ -20,6 +20,6 @@
 ```md
 ```
 #### 追加後
-```md
-## Unreleased
+```diff
+  ## Unreleased
 ```
