@@ -54,7 +54,7 @@ export function splitByFirstRelease(base: string): {
 
 	const before = base.slice(0, start);
 	if (before.match(/^### /m) || before.match(/^- /m)) {
-		return { before: '', header: '', body: before, after: '' };
+		return { before: '', header: '', body: before, after: base.slice(start) };
 	}
 	const header = base.slice(start, headerEnd);
 
@@ -77,8 +77,14 @@ type ParsedItem = {
 };
 
 // Compared to parseInsertion, parseBase is designed to be lossless and format error tolerant.
-function parseBase(clausesText: string): ParsedClause[] {
-	const lines = clausesText.split('\n');
+function parseBase(text: string): ParsedClause[] {
+	const _lines = text.split('\n');
+	const div1 = _lines.findIndex(line => !line.match(/^\s*$/));
+	const div2 = _lines.findLastIndex(line => !line.match(/^\s*$/)) + 1;
+	const leadingEmptyLines = _lines.slice(0, div1).join('\n');
+	const lines = _lines.slice(div1, div2);
+	const trailingEmptyLines = _lines.slice(div2).join('\n');
+
 	const result: ParsedClause[] = [];
 
 	for (const line of lines) {
@@ -112,6 +118,8 @@ function parseBase(clausesText: string): ParsedClause[] {
 		// 空行でなければ前itemの続きとみなす
 		else continueItem();
 	}
+	result.unshift({ kind: null, items: [{ kind: ' ', text: leadingEmptyLines }] });
+	result.push({ kind: null, items: [{ kind: ' ', text: trailingEmptyLines }] });
 	return result;
 }
 
