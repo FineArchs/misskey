@@ -109,6 +109,7 @@ type Source = {
 	perUserNotificationsMaxCount?: number;
 	deactivateAntennaThreshold?: number;
 	pidFile: string;
+	misskeyBlockMentionsFromUnfamiliarRemoteUsers?: boolean;
 
 	logging?: {
 		sql?: {
@@ -214,6 +215,7 @@ export type Config = {
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
+	misskeyBlockMentionsFromUnfamiliarRemoteUsers: boolean;
 };
 
 export type FulltextSearchProvider = 'sqlLike' | 'sqlPgroonga' | 'meilisearch';
@@ -329,6 +331,7 @@ export function loadConfig(): Config {
 		perUserNotificationsMaxCount: config.perUserNotificationsMaxCount ?? 500,
 		deactivateAntennaThreshold: config.deactivateAntennaThreshold ?? (1000 * 60 * 60 * 24 * 7),
 		pidFile: config.pidFile,
+		misskeyBlockMentionsFromUnfamiliarRemoteUsers: config.misskeyBlockMentionsFromUnfamiliarRemoteUsers ?? false,
 		logging: config.logging,
 	};
 }
