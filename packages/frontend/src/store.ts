@@ -176,6 +176,27 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'account',
 		default: false,
 	},
+	memo: {
+		where: 'account',
+		default: null,
+	},
+	reactions: {
+		where: 'account',
+		default: ['👍', '❤️', '⭐', '🤔', '😩', '㊗️', '🍮', ':iihanashi:', '🈂️', ':kandou:', ':voskey_icon:', ':takahashi_fankit:'],
+	},
+	pinnedEmojis: {
+		where: 'account',
+		default: [],
+	},
+	reactionAcceptance: {
+		where: 'account',
+		default: 'nonSensitiveOnly' as 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null,
+	},
+	mutedAds: {
+		where: 'account',
+		default: [] as string[],
+	},
+
 	menu: {
 		where: 'deviceAccount',
 		default: [
@@ -340,7 +361,7 @@ export const store = markRaw(new Pizzax('base', {
 	},
 	forceShowAds: {
 		where: 'device',
-		default: false,
+		default: true,
 	},
 	aiChanMode: {
 		where: 'device',

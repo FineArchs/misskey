@@ -66,8 +66,13 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 
 FROM --platform=$TARGETPLATFORM node:${NODE_VERSION}-slim AS runner
 
-ARG UID="991"
-ARG GID="991"
+ARG UID_H="991"
+ARG GID_H="991"
+
+ARG UID=${UID_H}
+ARG GID=${GID_H}
+
+ENV COREPACK_DEFAULT_TO_LATEST=0
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
