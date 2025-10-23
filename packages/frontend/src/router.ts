@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { inject } from 'vue';
+import { defineComponent, provide, inject } from 'vue';
 import { page } from '@/router.definition.js';
 import { $i } from '@/i.js';
 import { Nirax } from '@/lib/nirax.js';
@@ -44,3 +44,11 @@ mainRouter.init();
 export function useRouter(): Router {
 	return inject(DI.router, null) ?? mainRouter;
 }
+
+export const RouterProvider = defineComponent(
+	({ router: Router }, { slots }) => {
+    provide(DI.router, router);
+    return () => slots.default?.();
+  },
+	{ props: ['router'] },
+);

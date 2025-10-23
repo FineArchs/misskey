@@ -59,11 +59,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <component
 	:is="popup.component"
-	v-for="popup in popups"
-	:key="popup.id"
 	v-bind="popup.props"
 	v-on="popup.events"
 />
+<RouterProvider
+	v-for="popup in routedPopups"
+	:key="popup.id"
+	:router="popup.router"
+>
+	<component
+		:is="popup.component"
+		v-bind="popup.props"
+		v-on="popup.events"
+	/>
+</RouterProvider>
 
 <component
 	:is="prefer.s.animation ? TransitionGroup : 'div'"
@@ -108,6 +117,7 @@ import { swInject } from './sw-inject.js';
 import XNotification from './notification.vue';
 import { isSafeMode } from '@@/js/config.js';
 import { popups } from '@/os.js';
+import { popups as routedPopups } from '@/popovers/popup.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { pendingApiRequestsCount } from '@/utility/misskey-api.js';
@@ -118,6 +128,7 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
 import { store } from '@/store.js';
+import { RouterProvider } from '@/router.js';
 import XNavbar from '@/ui/_common_/navbar.vue';
 
 const XStreamIndicator = defineAsyncComponent(() => import('./stream-indicator.vue'));
