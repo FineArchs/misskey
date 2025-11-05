@@ -3,6 +3,19 @@ SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 
+<script lang="ts">
+import MkToast from './toast.vue';
+import { popup } from '@/os.js';
+
+export function toast(message: string) {
+	const { dispose } = popup(MkToast, {
+		message,
+	}, {
+		closed: () => dispose(),
+	});
+}
+</script>
+
 <template>
 <div>
 	<Transition
