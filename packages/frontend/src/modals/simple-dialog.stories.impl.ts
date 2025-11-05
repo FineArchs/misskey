@@ -7,12 +7,12 @@ import { action } from 'storybook/actions';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 import type { StoryObj } from '@storybook/vue3';
 import { i18n } from '@/i18n.js';
-import MkDialog from './MkDialog.vue';
+import MkSimpleDialog from './simple-dialog.vue';
 const Base = {
 	render(args) {
 		return {
 			components: {
-				MkDialog,
+				MkSimpleDialog,
 			},
 			setup() {
 				return {
@@ -32,7 +32,7 @@ const Base = {
 					};
 				},
 			},
-			template: '<MkDialog v-bind="props" v-on="events" />',
+			template: '<MkSimpleDialog v-bind="props" v-on="events" />',
 		};
 	},
 	args: {
@@ -41,49 +41,49 @@ const Base = {
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Success = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'success',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Error = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'error',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Warning = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'warning',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Info = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'info',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Question = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'question',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const Waiting = {
 	...Base,
 	args: {
 		...Base.args,
 		type: 'waiting',
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const DialogWithActions = {
 	...Question,
 	args: {
@@ -105,7 +105,7 @@ export const DialogWithActions = {
 			},
 		],
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const DialogWithDangerActions = {
 	...Warning,
 	args: {
@@ -128,7 +128,7 @@ export const DialogWithDangerActions = {
 			},
 		],
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;
 export const DialogWithInput = {
 	...Question,
 	args: {
@@ -156,4 +156,4 @@ export const DialogWithInput = {
 		await waitFor(() => userEvent.type(input, 'i'));
 		await expect(okButton).toBeEnabled();
 	},
-} satisfies StoryObj<typeof MkDialog>;
+} satisfies StoryObj<typeof MkSimpleDialog>;

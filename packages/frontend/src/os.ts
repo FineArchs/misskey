@@ -14,7 +14,6 @@ import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
-import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -23,7 +22,6 @@ import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
 import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
 import MkPageWindow from '@/components/MkPageWindow.vue';
-import MkDialog from '@/components/MkDialog.vue';
 import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
@@ -31,6 +29,8 @@ import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 import { focusParent } from '@/utility/focus.js';
+import { actions } from '@/modals/simple-dialogs.js';
+export { alert, confirm, actions, inputText, inputNumber, inputDatetime, select } from '@/modals/simple-dialogs.js';
 export { toast } from '@/modals/toast.vue';
 
 export const openingWindowsCount = ref(0);
@@ -248,238 +248,6 @@ export function pageWindow(path: string) {
 	});
 }
 
-export function alert(props: {
-	type?: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
-	title?: string;
-	text?: string;
-}): Promise<void> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, props, {
-			done: () => {
-				resolve();
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export function confirm(props: {
-	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
-	title?: string;
-	text?: string;
-	okText?: string;
-	cancelText?: string;
-}): Promise<{ canceled: boolean }> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			...props,
-			showCancelButton: true,
-		}, {
-			done: result => {
-				resolve(result ? result : { canceled: true });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-// TODO: const T extends ... にしたい
-// https://zenn.dev/general_link/articles/813e47b7a0eef7#const-type-parameters
-export function actions<T extends {
-	value: string;
-	text: string;
-	primary?: boolean,
-	danger?: boolean,
-}[]>(props: {
-	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
-	title?: string;
-	text?: string;
-	actions: T;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: T[number]['value'];
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			...props,
-			actions: props.actions.map(a => ({
-				text: a.text,
-				primary: a.primary,
-				danger: a.danger,
-				callback: () => {
-					resolve({ canceled: false, result: a.value });
-				},
-			})),
-		}, {
-			done: result => {
-				resolve(result ? result : { canceled: true });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-// default が指定されていたら result は null になり得ないことを保証する overload function
-export function inputText(props: {
-	type?: 'text' | 'email' | 'password' | 'url';
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default: string;
-	minLength?: number;
-	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string;
-}>;
-// min lengthが指定されてたら result は null になり得ないことを保証する overload function
-export function inputText(props: {
-	type?: 'text' | 'email' | 'password' | 'url';
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default?: string;
-	minLength: number;
-	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string;
-}>;
-export function inputText(props: {
-	type?: 'text' | 'email' | 'password' | 'url';
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default?: string | null;
-	minLength?: number;
-	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string | null;
-}>;
-export function inputText(props: {
-	type?: 'text' | 'email' | 'password' | 'url';
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default?: string | null;
-	minLength?: number;
-	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string | null;
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			title: props.title,
-			text: props.text,
-			input: {
-				type: props.type,
-				placeholder: props.placeholder,
-				autocomplete: props.autocomplete,
-				default: props.default ?? null,
-				minLength: props.minLength,
-				maxLength: props.maxLength,
-			},
-		}, {
-			done: result => {
-				resolve(result ? result : { canceled: true });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-// default が指定されていたら result は null になり得ないことを保証する overload function
-export function inputNumber(props: {
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: number;
-}>;
-export function inputNumber(props: {
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default?: number | null;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: number | null;
-}>;
-export function inputNumber(props: {
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	autocomplete?: string;
-	default?: number | null;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: number | null;
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			title: props.title,
-			text: props.text,
-			input: {
-				type: 'number',
-				placeholder: props.placeholder,
-				autocomplete: props.autocomplete,
-				default: props.default ?? null,
-			},
-		}, {
-			done: result => {
-				resolve(result ? result : { canceled: true });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export function inputDatetime(props: {
-	title?: string;
-	text?: string;
-	placeholder?: string | null;
-	default?: string | null;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: Date;
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			title: props.title,
-			text: props.text,
-			input: {
-				type: 'datetime-local',
-				placeholder: props.placeholder,
-				default: props.default ?? null,
-			},
-		}, {
-			done: result => {
-				resolve(result != null && result.result != null ? { result: new Date(result.result), canceled: false } : { result: undefined, canceled: true });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
 export function authenticateDialog(): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -489,33 +257,6 @@ export function authenticateDialog(): Promise<{
 		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkPasswordDialog.vue')), {}, {
 			done: result => {
 				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export function select<C extends OptionValue, D extends C | null = null>(props: {
-	title?: string;
-	text?: string;
-	default?: D;
-	items: (MkSelectItem<C> | undefined)[];
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: Exclude<D, undefined> extends null ? C | null : C;
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(MkDialog, {
-			title: props.title,
-			text: props.text,
-			select: {
-				items: props.items.filter(x => x !== undefined),
-				default: props.default ?? null,
-			},
-		}, {
-			done: result => {
-				resolve(result ? result : { canceled: true });
 			},
 			closed: () => dispose(),
 		});
