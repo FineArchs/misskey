@@ -21,7 +21,6 @@ import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
 import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
-import MkPageWindow from '@/components/MkPageWindow.vue';
 import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
@@ -31,6 +30,7 @@ import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 import { focusParent } from '@/utility/focus.js';
 import { actions } from '@/modals/simple-dialogs.js';
 export { alert, confirm, actions, inputText, inputNumber, inputDatetime, select } from '@/modals/simple-dialogs.js';
+export { pageWindow } from '@/modals/page-window.vue';
 export { toast } from '@/modals/toast.vue';
 
 export const openingWindowsCount = ref(0);
@@ -238,14 +238,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function pageWindow(path: string) {
-	const { dispose } = popup(MkPageWindow, {
-		initialPath: path,
-	}, {
-		closed: () => dispose(),
-	});
 }
 
 export function authenticateDialog(): Promise<{

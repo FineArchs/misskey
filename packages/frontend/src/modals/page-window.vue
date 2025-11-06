@@ -3,6 +3,19 @@ SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 
+<script lang="ts">
+import MkPageWindow from './page-window.vue';
+import { popup } from '@/os.js';
+
+export function pageWindow(path: string) {
+	const { dispose } = popup(MkPageWindow, {
+		initialPath: path,
+	}, {
+		closed: () => dispose(),
+	});
+}
+</script>
+
 <template>
 <MkWindow
 	ref="windowEl"
