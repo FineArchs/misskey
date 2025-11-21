@@ -13,8 +13,6 @@ import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-hel
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
-import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
-import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
@@ -30,7 +28,7 @@ import { waiting } from '@/modals/waiting-dialogs.vue';
 export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { toast } from '@/modals/toast.vue';
-export { authenticateDialog, form } from '@/modals/dynamically-importeds.js';
+export { authenticateDialog, form, selectUser, selectRole, pickEmoji, cropImageFile  } from '@/modals/dynamically-importeds.js';
 
 export const openingWindowsCount = ref(0);
 
@@ -54,7 +52,7 @@ export function claimZIndex(priority: keyof typeof zIndexes = 'low'): number {
 }
 
 // props に ref を許可するようにする
-type ComponentProps<T extends Component> = { [K in keyof CP<T>]: CP<T>[K] | Ref<CP<T>[K]> };
+export type ComponentProps<T extends Component> = { [K in keyof CP<T>]: CP<T>[K] | Ref<CP<T>[K]> };
 
 export function popup<T extends Component>(
 	component: T,
@@ -133,67 +131,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {
-	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserSelectDialog.vue')), {
-			includeSelf: opts.includeSelf,
-			localOnly: opts.localOnly,
-		}, {
-			ok: user => {
-				resolve(user);
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialog_TypeReferenceOnly>): Promise<
-	{ canceled: true; result: undefined; } |
-	{ canceled: false; result: Misskey.entities.Role[] }
-> {
-	return new Promise((resolve) => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkRoleSelectDialog.vue')), params, {
-			done: roles => {
-				resolve({ canceled: false, result: roles });
-			},
-			close: () => {
-				resolve({ canceled: true, result: undefined });
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerDialog_TypeReferenceOnly>): Promise<string> {
-	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkEmojiPickerDialog.vue')), {
-			anchorElement,
-			...opts,
-		}, {
-			done: emoji => {
-				resolve(emoji);
-			},
-			closed: () => dispose(),
-		});
-	});
-}
-
-export async function cropImageFile(imageFile: File | Blob, options: {
-	aspectRatio: number | null;
-}): Promise<File> {
-	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkCropperDialog.vue')), {
-			imageFile: imageFile,
-			aspectRatio: options.aspectRatio,
-		}, {
-			ok: x => {
-				resolve(x);
-			},
-			closed: () => dispose(),
-		});
-	});
 }
 
 export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElement | EventTarget | null, options?: {

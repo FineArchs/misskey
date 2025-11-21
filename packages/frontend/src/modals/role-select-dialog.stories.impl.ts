@@ -8,7 +8,7 @@ import type { StoryObj } from '@storybook/vue3';
 import { http, HttpResponse } from 'msw';
 import { role } from '../../.storybook/fakes.js';
 import { commonHandlers } from '../../.storybook/mocks.js';
-import MkRoleSelectDialog from '@/components/MkRoleSelectDialog.vue';
+import MkRoleSelectDialog from './role-select-dialog.vue';
 
 const roles = [
 	role({ displayOrder: 1 }, '1'), role({ displayOrder: 1 }, '1'), role({ displayOrder: 1 }, '1'), role({ displayOrder: 1 }, '1'),
