@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import MkSimpleDialog from './simple-dialog.vue';
 import { popup } from '@/os.js';
 import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';

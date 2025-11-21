@@ -31,6 +31,7 @@ import { waiting } from '@/modals/waiting-dialogs.vue';
 export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { toast } from '@/modals/toast.vue';
+export { authenticateDialog } from '@/modals/dynamically-importeds.js';
 
 export const openingWindowsCount = ref(0);
 
@@ -133,21 +134,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function authenticateDialog(): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: { password: string; token: string | null; };
-}> {
-	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkPasswordDialog.vue')), {}, {
-			done: result => {
-				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
-			},
-			closed: () => dispose(),
-		});
-	});
 }
 
 export function form<F extends Form>(title: string, f: F): Promise<{ canceled: true, result?: undefined } | { canceled?: false, result: GetFormResultType<F> }> {
