@@ -16,7 +16,6 @@ import type { UploaderFeatures } from '@/composables/use-uploader.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
-import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
@@ -27,6 +26,7 @@ export { alert, confirm, actions, inputText, inputNumber, inputDatetime, select 
 import { waiting } from '@/modals/waiting-dialogs.vue';
 export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
+export { popupMenu } from '@/modals/popup-menu.vue';
 export { toast } from '@/modals/toast.vue';
 export { authenticateDialog, form, selectUser, selectRole, pickEmoji, cropImageFile  } from '@/modals/dynamically-importeds.js';
 
@@ -131,36 +131,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElement | EventTarget | null, options?: {
-	align?: string;
-	width?: number;
-	onClosing?: () => void;
-}): Promise<void> {
-	if (!(anchorElement instanceof HTMLElement)) {
-		anchorElement = null;
-	}
-
-	let returnFocusTo = getHTMLElementOrNull(anchorElement) ?? getHTMLElementOrNull(window.document.activeElement);
-	return new Promise(resolve => nextTick(() => {
-		const { dispose } = popup(MkPopupMenu, {
-			items: items.filter(x => x != null),
-			anchorElement,
-			width: options?.width,
-			align: options?.align,
-			returnFocusTo,
-		}, {
-			closed: () => {
-				resolve();
-				dispose();
-				returnFocusTo = null;
-			},
-			closing: () => {
-				options?.onClosing?.();
-			},
-		});
-	}));
 }
 
 export function contextMenu(items: MenuItem[], ev: MouseEvent): Promise<void> {

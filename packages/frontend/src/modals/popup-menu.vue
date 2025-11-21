@@ -2,6 +2,43 @@
 SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
+<script lang="ts">
+import { nextTick } from 'vue';
+import { popup } from '@/os.js';
+import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
+import MkPopupMenu from './popup-menu.vue';
+import type { MenuItem } from '@/types/menu.js';
+
+export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElement | EventTarget | null, options?: {
+	align?: string;
+	width?: number;
+	onClosing?: () => void;
+}): Promise<void> {
+	if (!(anchorElement instanceof HTMLElement)) {
+		anchorElement = null;
+	}
+
+	let returnFocusTo = getHTMLElementOrNull(anchorElement) ?? getHTMLElementOrNull(window.document.activeElement);
+	return new Promise(resolve => nextTick(() => {
+		const { dispose } = popup(MkPopupMenu, {
+			items: items.filter(x => x != null),
+			anchorElement,
+			width: options?.width,
+			align: options?.align,
+			returnFocusTo,
+		}, {
+			closed: () => {
+				resolve();
+				dispose();
+				returnFocusTo = null;
+			},
+			closing: () => {
+				options?.onClosing?.();
+			},
+		});
+	}));
+}
+</script>
 
 <template>
 <MkModal ref="modal" v-slot="{ type, maxHeight }" :manualShowing="manualShowing" :zPriority="'high'" :anchorElement="anchorElement" :transparentBg="true" :returnFocusTo="returnFocusTo" @click="click" @close="onModalClose" @closed="onModalClosed">
@@ -11,9 +48,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, useTemplateRef } from 'vue';
-import MkModal from './MkModal.vue';
-import MkMenu from './MkMenu.vue';
-import type { MenuItem } from '@/types/menu.js';
+import MkModal from '@/components/MkModal.vue';
+import MkMenu from '@/components/MkMenu.vue';
+// import type { MenuItem } from '@/types/menu.js';
 
 defineProps<{
 	items: MenuItem[];
