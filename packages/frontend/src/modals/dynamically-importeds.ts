@@ -8,8 +8,8 @@
  */
 
 import { defineAsyncComponent } from 'vue';
-import MkPasswordDialog from './password-dialog.vue';
 import { popup } from '@/os.js';
+import type { Form, GetFormResultType } from '@/utility/form.js';
 
 export function authenticateDialog(): Promise<{
 	canceled: true; result: undefined;
@@ -20,6 +20,17 @@ export function authenticateDialog(): Promise<{
 		const { dispose } = popup(defineAsyncComponent(() => import('./password-dialog.vue')), {}, {
 			done: result => {
 				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
+			},
+			closed: () => dispose(),
+		});
+	});
+}
+
+export function form<F extends Form>(title: string, f: F): Promise<{ canceled: true, result?: undefined } | { canceled?: false, result: GetFormResultType<F> }> {
+	return new Promise(resolve => {
+		const { dispose } = popup(defineAsyncComponent(() => import('./form-dialog.vue')), { title, form: f }, {
+			done: result => {
+				resolve(result);
 			},
 			closed: () => dispose(),
 		});

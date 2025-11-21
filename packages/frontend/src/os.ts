@@ -10,7 +10,6 @@ import { EventEmitter } from 'eventemitter3';
 import * as Misskey from 'misskey-js';
 import type { Component, Ref } from 'vue';
 import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
-import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
@@ -31,7 +30,7 @@ import { waiting } from '@/modals/waiting-dialogs.vue';
 export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { toast } from '@/modals/toast.vue';
-export { authenticateDialog } from '@/modals/dynamically-importeds.js';
+export { authenticateDialog, form } from '@/modals/dynamically-importeds.js';
 
 export const openingWindowsCount = ref(0);
 
@@ -134,17 +133,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function form<F extends Form>(title: string, f: F): Promise<{ canceled: true, result?: undefined } | { canceled?: false, result: GetFormResultType<F> }> {
-	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkFormDialog.vue')), { title, form: f }, {
-			done: result => {
-				resolve(result);
-			},
-			closed: () => dispose(),
-		});
-	});
 }
 
 export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {
