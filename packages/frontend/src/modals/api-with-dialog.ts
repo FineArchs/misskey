@@ -1,8 +1,8 @@
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
-import { promiseDialog } from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import { promiseDialog } from '@/modals/waiting-dialogs.vue';
 import { alert, actions } from '@/modals/simple-dialogs.js';
 
 export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;

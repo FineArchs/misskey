@@ -19,7 +19,6 @@ import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPick
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
-import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
 import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
@@ -28,53 +27,12 @@ import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 import { focusParent } from '@/utility/focus.js';
 export { apiWithDialog, type ApiWithDialogCustomErrors } from '@/modals/api-with-dialog.js';
 export { alert, confirm, actions, inputText, inputNumber, inputDatetime, select } from '@/modals/simple-dialogs.js';
+import { waiting } from '@/modals/waiting-dialogs.vue';
+export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { toast } from '@/modals/toast.vue';
 
 export const openingWindowsCount = ref(0);
-
-export function promiseDialog<T extends Promise<any>>(
-	promise: T,
-	onSuccess?: ((res: Awaited<T>) => void) | null,
-	onFailure?: ((err: Misskey.api.APIError) => void) | null,
-	text?: string,
-): T {
-	const showing = ref(true);
-	const success = ref(false);
-
-	promise.then(res => {
-		if (onSuccess) {
-			showing.value = false;
-			onSuccess(res);
-		} else {
-			success.value = true;
-			window.setTimeout(() => {
-				showing.value = false;
-			}, 1000);
-		}
-	}).catch(err => {
-		showing.value = false;
-		if (onFailure) {
-			onFailure(err);
-		} else {
-			alert({
-				type: 'error',
-				text: err,
-			});
-		}
-	});
-
-	// NOTE: dynamic importすると挙動がおかしくなる(showingの変更が伝播しない)
-	const { dispose } = popup(MkWaitingDialog, {
-		success: success,
-		showing: showing,
-		text: text,
-	}, {
-		closed: () => dispose(),
-	});
-
-	return promise;
-}
 
 let popupIdCount = 0;
 export const popups = ref<{
@@ -190,54 +148,6 @@ export function authenticateDialog(): Promise<{
 			closed: () => dispose(),
 		});
 	});
-}
-
-export function success(): Promise<void> {
-	return new Promise(resolve => {
-		const showing = ref(true);
-		window.setTimeout(() => {
-			showing.value = false;
-		}, 1000);
-		const { dispose } = popup(MkWaitingDialog, {
-			success: true,
-			showing: showing,
-		}, {
-			done: () => resolve(),
-			closed: () => dispose(),
-		});
-	});
-}
-
-export function waiting(options: { text?: string } = {}) {
-	window.document.body.setAttribute('inert', 'true');
-
-	const showing = ref(true);
-	const isSuccess = ref(false);
-
-	function done(doneOptions: { success?: boolean } = {}) {
-		if (doneOptions.success) {
-			isSuccess.value = true;
-			window.setTimeout(() => {
-				showing.value = false;
-			}, 1000);
-		} else {
-			showing.value = false;
-		}
-	}
-
-	// NOTE: dynamic importすると挙動がおかしくなる(showingの変更が伝播しない)
-	const { dispose } = popup(MkWaitingDialog, {
-		success: isSuccess,
-		showing: showing,
-		text: options.text,
-	}, {
-		closed: () => {
-			window.document.body.removeAttribute('inert');
-			dispose();
-		},
-	});
-
-	return done;
 }
 
 export function form<F extends Form>(title: string, f: F): Promise<{ canceled: true, result?: undefined } | { canceled?: false, result: GetFormResultType<F> }> {

@@ -164,7 +164,7 @@ export async function refreshCurrentAccount() {
 
 export async function login(token: AccountWithToken['token'], redirect?: string) {
 	const showing = ref(true);
-	const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkWaitingDialog.vue')), {
+	const { dispose } = popup(defineAsyncComponent(() => import('@/modals/waiting-dialogs.vue')), {
 		success: false,
 		showing: showing,
 	}, {
