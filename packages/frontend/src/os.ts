@@ -10,16 +10,13 @@ import { EventEmitter } from 'eventemitter3';
 import * as Misskey from 'misskey-js';
 import type { Component, Ref } from 'vue';
 import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
-import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
 import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
-import MkContextMenu from '@/components/MkContextMenu.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
-import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 import { focusParent } from '@/utility/focus.js';
 export { apiWithDialog, type ApiWithDialogCustomErrors } from '@/modals/api-with-dialog.js';
 export { alert, confirm, actions, inputText, inputNumber, inputDatetime, select } from '@/modals/simple-dialogs.js';
@@ -27,6 +24,7 @@ import { waiting } from '@/modals/waiting-dialogs.vue';
 export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { popupMenu } from '@/modals/popup-menu.vue';
+export { contextMenu } from '@/modals/context-menu.vue';
 export { toast } from '@/modals/toast.vue';
 export { authenticateDialog, form, selectUser, selectRole, pickEmoji, cropImageFile  } from '@/modals/dynamically-importeds.js';
 
@@ -131,35 +129,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function contextMenu(items: MenuItem[], ev: MouseEvent): Promise<void> {
-	if (
-		prefer.s.contextMenu === 'native' ||
-		(prefer.s.contextMenu === 'appWithShift' && !ev.shiftKey)
-	) {
-		return Promise.resolve();
-	}
-
-	let returnFocusTo = getHTMLElementOrNull(ev.currentTarget ?? ev.target) ?? getHTMLElementOrNull(window.document.activeElement);
-	ev.preventDefault();
-	return new Promise(resolve => nextTick(() => {
-		const { dispose } = popup(MkContextMenu, {
-			items,
-			ev,
-		}, {
-			closed: () => {
-				resolve();
-				dispose();
-
-				// MkModalを通していないのでここでフォーカスを戻す処理を行う
-				if (returnFocusTo != null) {
-					focusParent(returnFocusTo, true, false);
-					returnFocusTo = null;
-				}
-			},
-		});
-	}));
 }
 
 export function post(props: PostFormProps = {}): Promise<void> {

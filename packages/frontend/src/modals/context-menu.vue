@@ -2,6 +2,43 @@
 SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
+<script lang="ts">
+import { nextTick } from 'vue';
+import { popup } from '@/os.js';
+import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
+import { focusParent } from '@/utility/focus.js';
+import MkContextMenu from './context-menu.vue';
+import type { MenuItem } from '@/types/menu.js';
+
+export function contextMenu(items: MenuItem[], ev: MouseEvent): Promise<void> {
+	if (
+		prefer.s.contextMenu === 'native' ||
+		(prefer.s.contextMenu === 'appWithShift' && !ev.shiftKey)
+	) {
+		return Promise.resolve();
+	}
+
+	let returnFocusTo = getHTMLElementOrNull(ev.currentTarget ?? ev.target) ?? getHTMLElementOrNull(window.document.activeElement);
+	ev.preventDefault();
+	return new Promise(resolve => nextTick(() => {
+		const { dispose } = popup(MkContextMenu, {
+			items,
+			ev,
+		}, {
+			closed: () => {
+				resolve();
+				dispose();
+
+				// MkModalを通していないのでここでフォーカスを戻す処理を行う
+				if (returnFocusTo != null) {
+					focusParent(returnFocusTo, true, false);
+					returnFocusTo = null;
+				}
+			},
+		});
+	}));
+}
+</script>
 
 <template>
 <Transition
@@ -19,8 +56,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, useTemplateRef, ref } from 'vue';
-import MkMenu from './MkMenu.vue';
-import type { MenuItem } from '@/types/menu.js';
+import MkMenu from '@/components/MkMenu.vue';
+// import type { MenuItem } from '@/types/menu.js';
 import contains from '@/utility/contains.js';
 import { prefer } from '@/preferences.js';
 import * as os from '@/os.js';
