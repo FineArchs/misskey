@@ -10,11 +10,9 @@ import { EventEmitter } from 'eventemitter3';
 import * as Misskey from 'misskey-js';
 import type { Component, Ref } from 'vue';
 import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
-import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
-import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import { focusParent } from '@/utility/focus.js';
@@ -25,6 +23,7 @@ export { success, waiting, promiseDialog } from '@/modals/waiting-dialogs.vue';
 export { pageWindow } from '@/modals/page-window.vue';
 export { popupMenu } from '@/modals/popup-menu.vue';
 export { contextMenu } from '@/modals/context-menu.vue';
+export { post } from '@/modals/postform-dialog.vue';
 export { toast } from '@/modals/toast.vue';
 export { authenticateDialog, form, selectUser, selectRole, pickEmoji, cropImageFile  } from '@/modals/dynamically-importeds.js';
 
@@ -129,34 +128,6 @@ export async function popupAsyncWithDialog<T extends Component>(
 	return {
 		dispose,
 	};
-}
-
-export function post(props: PostFormProps = {}): Promise<void> {
-	pleaseLogin({
-		openOnRemote: (props.initialText || props.initialNote ? {
-			type: 'share',
-			params: {
-				text: props.initialText ?? props.initialNote?.text ?? '',
-				visibility: props.initialVisibility ?? props.initialNote?.visibility ?? 'public',
-				localOnly: (props.initialLocalOnly || props.initialNote?.localOnly) ? '1' : '0',
-			},
-		} : undefined),
-	});
-
-	showMovedDialog();
-	return new Promise(resolve => {
-		// NOTE: MkPostFormDialogをdynamic importするとiOSでテキストエリアに自動フォーカスできない
-		// NOTE: ただ、dynamic importしない場合、MkPostFormDialogインスタンスが使いまわされ、
-		//       Vueが渡されたコンポーネントに内部的に__propsというプロパティを生やす影響で、
-		//       複数のpost formを開いたときに場合によってはエラーになる
-		//       もちろん複数のpost formを開けること自体Misskeyサイドのバグなのだが
-		const { dispose } = popup(MkPostFormDialog, props, {
-			closed: () => {
-				resolve();
-				dispose();
-			},
-		});
-	});
 }
 
 export const deckGlobalEvents = new EventEmitter();
