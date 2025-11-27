@@ -496,7 +496,7 @@ function toggleRoleItem(role: typeof info.value.roles[number]) {
 }
 
 async function createAnnouncement() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
 		user: user.value,
 	}, {
 		closed: () => dispose(),
@@ -504,7 +504,7 @@ async function createAnnouncement() {
 }
 
 async function editAnnouncement(announcement) {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
 		user: user.value,
 		announcement,
 	}, {

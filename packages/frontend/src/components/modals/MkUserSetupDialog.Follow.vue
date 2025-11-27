@@ -37,7 +37,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw } from 'vue';
 import { i18n } from '@/i18n.js';
 import MkFolder from '@/components/MkFolder.vue';
-import XUser from '@/components/MkUserSetupDialog.User.vue';
+import XUser from '@/components/modals/MkUserSetupDialog.User.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { Paginator } from '@/utility/paginator.js';
 

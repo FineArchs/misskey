@@ -514,7 +514,7 @@ async function openSetupWizard() {
 	});
 	if (canceled) return;
 
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkServerSetupWizardDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkServerSetupWizardDialog.vue').then(x => x.default), {
 	}, {
 		closed: () => dispose(),
 	});

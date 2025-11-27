@@ -75,7 +75,7 @@ export async function genEmbedCode(entity: EmbeddableEntity, id: string, params?
 	if (window.innerWidth < MOBILE_THRESHOLD) {
 		copyToClipboard(getEmbedCode(`/embed/${entity}/${id}`, _params));
 	} else {
-		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkEmbedCodeGenDialog.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkEmbedCodeGenDialog.vue').then(x => x.default), {
 			entity,
 			id,
 			params: _params,

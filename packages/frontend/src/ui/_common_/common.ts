@@ -157,7 +157,7 @@ export function openInstanceMenu(ev: MouseEvent) {
 			text: i18n.ts._initialTutorial.launchTutorial,
 			icon: 'ti ti-presentation',
 			action: async () => {
-				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTutorialDialog.vue').then(x => x.default), {}, {
+				const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkTutorialDialog.vue').then(x => x.default), {}, {
 					closed: () => dispose(),
 				});
 			},

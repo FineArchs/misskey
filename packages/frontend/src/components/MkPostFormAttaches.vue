@@ -169,7 +169,7 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent | Keyboar
 			text: i18n.ts.preview,
 			icon: 'ti ti-photo-search',
 			action: async () => {
-				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImgPreviewDialog.vue').then(x => x.default), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkImgPreviewDialog.vue').then(x => x.default), {
 					file: file,
 				}, {
 					closed: () => dispose(),

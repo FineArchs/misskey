@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getUnicodeEmojiOrNull } from '@@/js/emojilist.js';
-import MkCustomEmojiDetailedDialog from './MkCustomEmojiDetailedDialog.vue';
+import MkCustomEmojiDetailedDialog from '@/components/modals/MkCustomEmojiDetailedDialog.vue';
 import type { MenuItem } from '@/types/menu';
 import XDetails from '@/components/MkReactionsViewer.details.vue';
 import MkReactionIcon from '@/components/MkReactionIcon.vue';

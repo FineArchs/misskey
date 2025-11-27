@@ -40,7 +40,7 @@ const emit = defineEmits<{
 }>();
 
 async function edit() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkWatermarkEditorDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/modals/MkWatermarkEditorDialog.vue')), {
 		presetEditMode: true,
 		preset: deepClone(props.preset),
 		layers: deepClone(props.preset.layers),

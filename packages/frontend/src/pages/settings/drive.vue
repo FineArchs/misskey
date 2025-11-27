@@ -310,7 +310,7 @@ function chooseUploadFolder() {
 }
 
 async function addWatermarkPreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkWatermarkEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		layers: [],
@@ -369,7 +369,7 @@ function onDeleteImageFramePreset(id: string) {
 }
 
 async function addImageFramePreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkImageFrameEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		params: null,

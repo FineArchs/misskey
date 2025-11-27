@@ -59,7 +59,7 @@ import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
-import XLayer from '@/components/MkImageEffectorDialog.Layer.vue';
+import XLayer from '@/components/modals/MkImageEffectorDialog.Layer.vue';
 import * as os from '@/os.js';
 import { deepClone } from '@/utility/clone.js';
 import { FXS } from '@/utility/image-effector/fxs.js';

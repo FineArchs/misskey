@@ -6,14 +6,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import type { StoryObj } from '@storybook/vue3';
 import { HttpResponse, http } from 'msw';
-import { commonHandlers } from '../../.storybook/mocks.js';
-import { userDetailed } from '../../.storybook/fakes.js';
-import MkUserSetupDialog from './MkUserSetupDialog.vue';
+import { commonHandlers } from '../../../.storybook/mocks.js';
+import { userDetailed } from '../../../.storybook/fakes.js';
+import MkUserSetupDialog_Follow from './MkUserSetupDialog.Follow.vue';
 export const Default = {
 	render(args) {
 		return {
 			components: {
-				MkUserSetupDialog,
+				MkUserSetupDialog_Follow,
 			},
 			setup() {
 				return {
@@ -27,7 +27,7 @@ export const Default = {
 					};
 				},
 			},
-			template: '<MkUserSetupDialog v-bind="props" />',
+			template: '<MkUserSetupDialog_Follow v-bind="props" />',
 		};
 	},
 	args: {
@@ -53,4 +53,4 @@ export const Default = {
 			],
 		},
 	},
-} satisfies StoryObj<typeof MkUserSetupDialog>;
+} satisfies StoryObj<typeof MkUserSetupDialog_Follow>;

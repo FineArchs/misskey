@@ -4,7 +4,7 @@
  */
 
 import type { StoryObj } from '@storybook/vue3';
-import { file } from '../../.storybook/fakes.js';
+import { file } from '../../../.storybook/fakes.js';
 import MkImgPreviewDialog from './MkImgPreviewDialog.vue';
 export const Default = {
 	render(args) {

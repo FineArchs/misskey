@@ -5,8 +5,8 @@
 
 import { HttpResponse, http } from 'msw';
 import { action } from 'storybook/actions';
-import { file } from '../../.storybook/fakes.js';
-import { commonHandlers } from '../../.storybook/mocks.js';
+import { file } from '../../../.storybook/fakes.js';
+import { commonHandlers } from '../../../.storybook/mocks.js';
 import MkCropperDialog from './MkCropperDialog.vue';
 import type { StoryObj } from '@storybook/vue3';
 export const Default = {

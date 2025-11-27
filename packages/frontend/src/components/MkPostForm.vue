@@ -1204,7 +1204,7 @@ async function openAccountMenu(ev: MouseEvent) {
 	if (props.mock) return;
 
 	function showDraftsDialog(scheduled: boolean) {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteDraftsDialog.vue')), {
+		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/modals/MkNoteDraftsDialog.vue')), {
 			scheduled,
 		}, {
 			restore: async (draft: Misskey.entities.NoteDraft) => {

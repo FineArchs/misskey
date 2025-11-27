@@ -72,7 +72,7 @@ import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import XLayer from '@/components/MkWatermarkEditorDialog.Layer.vue';
+import XLayer from '@/components/modals/MkWatermarkEditorDialog.Layer.vue';
 import * as os from '@/os.js';
 import { deepClone } from '@/utility/clone.js';
 import { ensureSignin } from '@/i.js';

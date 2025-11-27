@@ -58,7 +58,7 @@ export async function pleaseLogin(opts: {
 		_openOnRemote = opts.openOnRemote;
 	}
 
-	const { dispose } = await popupAsyncWithDialog(import('@/components/MkSigninDialog.vue').then(x => x.default), {
+	const { dispose } = await popupAsyncWithDialog(import('@/components/modals/MkSigninDialog.vue').then(x => x.default), {
 		autoSet: true,
 		message: opts.message ?? (_openOnRemote ? i18n.ts.signinOrContinueOnRemote : i18n.ts.signinRequired),
 		openOnRemote: _openOnRemote,

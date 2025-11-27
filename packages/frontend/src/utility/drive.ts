@@ -181,7 +181,7 @@ export function chooseDriveFile(options: {
 	multiple?: boolean;
 } = {}): Promise<Misskey.entities.DriveFile[]> {
 	return new Promise(async resolve => {
-		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkDriveFileSelectDialog.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkDriveFileSelectDialog.vue').then(x => x.default), {
 			multiple: options.multiple ?? false,
 		}, {
 			done: files => {
@@ -302,7 +302,7 @@ export async function createCroppedImageDriveFileFromImageDriveFile(imageDriveFi
 
 export async function selectDriveFolder(initialFolder: Misskey.entities.DriveFolder['id'] | null): Promise<(Misskey.entities.DriveFolder | null)[]> {
 	return new Promise(async resolve => {
-		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkDriveFolderSelectDialog.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkDriveFolderSelectDialog.vue').then(x => x.default), {
 			initialFolder,
 		}, {
 			done: folders => {

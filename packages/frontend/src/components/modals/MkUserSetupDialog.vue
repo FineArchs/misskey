@@ -132,9 +132,9 @@ import { ref, useTemplateRef, watch, nextTick, defineAsyncComponent } from 'vue'
 import { host } from '@@/js/config.js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
-import XProfile from '@/components/MkUserSetupDialog.Profile.vue';
-import XFollow from '@/components/MkUserSetupDialog.Follow.vue';
-import XPrivacy from '@/components/MkUserSetupDialog.Privacy.vue';
+import XProfile from '@/components/modals/MkUserSetupDialog.Profile.vue';
+import XFollow from '@/components/modals/MkUserSetupDialog.Follow.vue';
+import XPrivacy from '@/components/modals/MkUserSetupDialog.Privacy.vue';
 import MkAnimBg from '@/components/MkAnimBg.vue';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
@@ -175,7 +175,7 @@ function setupComplete() {
 function launchTutorial() {
 	setupComplete();
 	nextTick(async () => {
-		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTutorialDialog.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkTutorialDialog.vue').then(x => x.default), {
 			initialPage: 1,
 		}, {
 			closed: () => dispose(),

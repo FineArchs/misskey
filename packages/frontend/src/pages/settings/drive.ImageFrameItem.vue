@@ -40,7 +40,7 @@ const emit = defineEmits<{
 }>();
 
 async function edit() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkImageFrameEditorDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/modals/MkImageFrameEditorDialog.vue')), {
 		presetEditMode: true,
 		preset: deepClone(props.preset),
 		params: deepClone(props.preset.params),

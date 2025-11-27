@@ -4,15 +4,14 @@
  */
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable import/no-default-export */
 import type { StoryObj } from '@storybook/vue3';
-import { emojiDetailed } from '../../.storybook/fakes.js';
-import MkCustomEmojiDetailedDialog from './MkCustomEmojiDetailedDialog.vue';
+import { userDetailed } from '../../../.storybook/fakes.js';
+import MkUserSetupDialog_User from './MkUserSetupDialog.User.vue';
 export const Default = {
 	render(args) {
 		return {
 			components: {
-				MkCustomEmojiDetailedDialog,
+				MkUserSetupDialog_User,
 			},
 			setup() {
 				return {
@@ -26,13 +25,13 @@ export const Default = {
 					};
 				},
 			},
-			template: '<MkCustomEmojiDetailedDialog v-bind="props" />',
+			template: '<MkUserSetupDialog_User v-bind="props" />',
 		};
 	},
 	args: {
-		emoji: emojiDetailed(),
+		user: userDetailed(),
 	},
 	parameters: {
 		layout: 'centered',
 	},
-} satisfies StoryObj<typeof MkCustomEmojiDetailedDialog>;
+} satisfies StoryObj<typeof MkUserSetupDialog_User>;

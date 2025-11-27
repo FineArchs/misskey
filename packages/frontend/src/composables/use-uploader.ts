@@ -251,7 +251,7 @@ export function useUploader(options: {
 					icon: 'ti ti-sparkles',
 					text: i18n.ts._imageEffector.title,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageEffectorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkImageEffectorDialog.vue').then(x => x.default), {
 							image: item.file,
 						}, {
 							ok: (file) => {
@@ -299,7 +299,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkWatermarkEditorDialog.vue').then(x => x.default), {
 							layers: item.watermarkLayers,
 							image: item.file,
 						}, {
@@ -351,7 +351,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: item.imageFrameParams,
 							image: item.file,
 							imageCaption: item.caption ?? null,
@@ -377,7 +377,7 @@ export function useUploader(options: {
 					type: 'button' as const,
 					text: preset.name,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@/components/modals/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: preset.params,
 							image: item.file,
 							imageCaption: item.caption ?? null,

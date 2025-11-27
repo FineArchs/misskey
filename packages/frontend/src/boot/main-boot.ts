@@ -108,14 +108,14 @@ export async function mainBoot() {
 	if ($i) {
 		store.loaded.then(async () => {
 			if (store.s.accountSetupWizard !== -1) {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserSetupDialog.vue')), {}, {
+				const { dispose } = popup(defineAsyncComponent(() => import('@/components/modals/MkUserSetupDialog.vue')), {}, {
 					closed: () => dispose(),
 				});
 			}
 		});
 
 		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog')) {
-			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+			const { dispose } = popup(defineAsyncComponent(() => import('@/components/modals/MkAnnouncementDialog.vue')), {
 				announcement,
 			}, {
 				closed: () => dispose(),
@@ -125,7 +125,7 @@ export async function mainBoot() {
 		function onAnnouncementCreated(ev: { announcement: Misskey.entities.Announcement }) {
 			const announcement = ev.announcement;
 			if (announcement.display === 'dialog') {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+				const { dispose } = popup(defineAsyncComponent(() => import('@/components/modals/MkAnnouncementDialog.vue')), {
 					announcement,
 				}, {
 					closed: () => dispose(),

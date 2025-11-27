@@ -68,13 +68,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { reactive, useTemplateRef } from 'vue';
-import MkInput from './MkInput.vue';
-import MkTextarea from './MkTextarea.vue';
-import MkSwitch from './MkSwitch.vue';
-import MkSelect from './MkSelect.vue';
-import MkRange from './MkRange.vue';
-import MkButton from './MkButton.vue';
-import MkRadios from './MkRadios.vue';
+import MkInput from '@/components/MkInput.vue';
+import MkTextarea from '@/components/MkTextarea.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
+import MkSelect from '@/components/MkSelect.vue';
+import MkRange from '@/components/MkRange.vue';
+import MkButton from '@/components/MkButton.vue';
+import MkRadios from '@/components/MkRadios.vue';
 import XFile from './MkFormDialog.file.vue';
 import type { MkSelectItem } from '@/components/MkSelect.vue';
 import type { Form, EnumFormItem, RadioFormItem } from '@/utility/form.js';
