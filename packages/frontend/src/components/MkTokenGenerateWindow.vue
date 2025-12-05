@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 >
 	<template #header>{{ title || i18n.ts.generateAccessToken }}</template>
 
-	<MkSpacer :marginMin="20" :marginMax="28">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 		<div class="_gaps_m">
 			<div v-if="information">
 				<MkInfo warn>{{ information }}</MkInfo>
@@ -35,19 +35,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_s">
 				<MkSwitch v-for="kind in Object.keys(permissionSwitches)" :key="kind" v-model="permissionSwitches[kind]">{{ i18n.ts._permissions[kind] }}</MkSwitch>
 			</div>
-			<div v-if="iAmAdmin" :class="$style.adminPermissions">
+			<div v-if="iAmModerator" :class="$style.adminPermissions">
 				<div :class="$style.adminPermissionsHeader"><b>{{ i18n.ts.adminPermission }}</b></div>
 				<div class="_gaps_s">
 					<MkSwitch v-for="kind in Object.keys(permissionSwitchesForAdmin)" :key="kind" v-model="permissionSwitchesForAdmin[kind]">{{ i18n.ts._permissions[kind] }}</MkSwitch>
 				</div>
 			</div>
 		</div>
-	</MkSpacer>
+	</div>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, ref } from 'vue';
+import { useTemplateRef, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInput from './MkInput.vue';
 import MkSwitch from './MkSwitch.vue';
@@ -55,7 +55,7 @@ import MkButton from './MkButton.vue';
 import MkInfo from './MkInfo.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import { i18n } from '@/i18n.js';
-import { iAmAdmin } from '@/account.js';
+import { iAmModerator } from '@/i.js';
 
 const props = withDefaults(defineProps<{
 	title?: string | null;
@@ -77,10 +77,10 @@ const emit = defineEmits<{
 const defaultPermissions = Misskey.permissions.filter(p => !p.startsWith('read:admin') && !p.startsWith('write:admin'));
 const adminPermissions = Misskey.permissions.filter(p => p.startsWith('read:admin') || p.startsWith('write:admin'));
 
-const dialog = shallowRef<InstanceType<typeof MkModalWindow>>();
+const dialog = useTemplateRef('dialog');
 const name = ref(props.initialName);
-const permissionSwitches = ref(<Record<(typeof Misskey.permissions)[number], boolean>>{});
-const permissionSwitchesForAdmin = ref(<Record<(typeof Misskey.permissions)[number], boolean>>{});
+const permissionSwitches = ref({} as Record<(typeof Misskey.permissions)[number], boolean>);
+const permissionSwitchesForAdmin = ref({} as Record<(typeof Misskey.permissions)[number], boolean>);
 
 if (props.initialPermissions) {
 	for (const kind of props.initialPermissions) {
@@ -91,7 +91,7 @@ if (props.initialPermissions) {
 		permissionSwitches.value[kind] = false;
 	}
 
-	if (iAmAdmin) {
+	if (iAmModerator) {
 		for (const kind of adminPermissions) {
 			permissionSwitchesForAdmin.value[kind] = false;
 		}
@@ -103,7 +103,7 @@ function ok(): void {
 		name: name.value,
 		permissions: [
 			...Object.keys(permissionSwitches.value).filter(p => permissionSwitches.value[p]),
-			...(iAmAdmin ? Object.keys(permissionSwitchesForAdmin.value).filter(p => permissionSwitchesForAdmin.value[p]) : []),
+			...(iAmModerator ? Object.keys(permissionSwitchesForAdmin.value).filter(p => permissionSwitchesForAdmin.value[p]) : []),
 		],
 	});
 	dialog.value?.close();
@@ -113,7 +113,7 @@ function disableAll(): void {
 	for (const p in permissionSwitches.value) {
 		permissionSwitches.value[p] = false;
 	}
-	if (iAmAdmin) {
+	if (iAmModerator) {
 		for (const p in permissionSwitchesForAdmin.value) {
 			permissionSwitchesForAdmin.value[p] = false;
 		}
@@ -124,7 +124,7 @@ function enableAll(): void {
 	for (const p in permissionSwitches.value) {
 		permissionSwitches.value[p] = true;
 	}
-	if (iAmAdmin) {
+	if (iAmModerator) {
 		for (const p in permissionSwitchesForAdmin.value) {
 			permissionSwitchesForAdmin.value[p] = true;
 		}
