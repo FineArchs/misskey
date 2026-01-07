@@ -29,6 +29,7 @@ export type Keys = (
 	'customCss' |
 	'chatMessageDrafts' |
 	'scratchpad' |
+	`scratchpad:settings:${string}` |
 	'debug' |
 	'preferences' |
 	'latestPreferencesUpdate' |

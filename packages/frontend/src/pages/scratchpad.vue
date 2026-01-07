@@ -7,6 +7,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader>
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div class="_gaps">
+			<MkContainer :foldable="true" :expanded="false">
+				<template #header>{{ i18n.ts.settings }}</template>
+				<div :class="$style.settings">
+					<XEnv v-model="envSetting"/>
+				</div>
+			</MkContainer>
+
 			<div class="_gaps_s">
 				<div :class="$style.editor" class="_panel">
 					<MkCodeEditor v-model="code" lang="aiscript"/>
@@ -56,7 +63,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onDeactivated, onUnmounted, ref, watch, computed } from 'vue';
-import { Interpreter, Parser, utils } from '@syuilo/aiscript';
+import { Interpreter, Parser, values, utils } from '@syuilo/aiscript';
+import { url } from '@@/js/config.js';
 import type { Ref } from 'vue';
 import type { AsUiComponent } from '@/aiscript/ui.js';
 import type { AsUiRoot } from '@/aiscript/ui.js';
@@ -74,6 +82,8 @@ import { registerAsUiLib } from '@/aiscript/ui.js';
 import MkAsUi from '@/components/MkAsUi.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/utility/achievements.js';
+import XEnv, { envDefault } from './scratchpad.settings.env.vue';
+import type { EnvSetting, LibKey } from './scratchpad.settings.env.vue';
 
 const parser = new Parser();
 let aiscript: Interpreter;
@@ -92,10 +102,42 @@ const saved = miLocalStorage.getItem('scratchpad');
 if (saved) {
 	code.value = saved;
 }
-
 watch(code, () => {
 	miLocalStorage.setItem('scratchpad', code.value);
 });
+
+const libGetter: Record<LibKey, (env: EnvSetting) => Record<string, Value>> = {
+	mk({ withCredential }) {
+		return createAiScriptEnv({
+			storageKey: 'widget',
+			token: withCredential ? $i?.token : undefined,
+		});
+	},
+	ui() {
+		return registerAsUiLib(components.value, (_root) => {
+			root.value = _root.value
+		});
+	},
+	play() {
+		return {
+			THIS_ID: values.STR("scratchpad"),
+			THIS_URL: values.STR(`${url}/scratchpad`),
+		};
+	},
+};
+
+function scratchpadSetting<T>(_key: string, defV: T) {
+	const key = `scratchpad:settings:${_key}` as const;
+	const saved = miLocalStorage.getItemAsJson(key);
+	const v = ref<T>(saved ?? defV);
+	watch(v, () => {
+		miLocalStorage.setItemAsJson(key, v.value);
+		//console.log(key, v.value);
+	});
+	return v;
+}
+
+const envSetting = scratchpadSetting<EnvSetting>("env", envDefault);
 
 function stringifyUiProps(uiProps) {
 	return JSON.stringify(
@@ -111,15 +153,10 @@ async function run() {
 	components.value = [];
 	uiKey.value++;
 	logs.value = [];
-	aiscript = new Interpreter(({
-		...createAiScriptEnv({
-			storageKey: 'widget',
-			token: $i?.token,
-		}),
-		...registerAsUiLib(components.value, (_root) => {
-			root.value = _root.value;
-		}),
-	}), {
+	const libs = envSetting.value.libs.reduce((a, v) => (
+		{ ...a, ...libGetter[v](envSetting.value) }
+	), {});
+	aiscript = new Interpreter(libs, {
 		in: aiScriptReadline,
 		out: (value) => {
 			if (value.type === 'str' && value.value.toLowerCase().replace(',', '').includes('hello world')) {
@@ -210,6 +247,10 @@ definePage(() => ({
 
 <style lang="scss" module>
 .root {
+}
+
+.settings {
+	padding: 32px;
 }
 
 .editor {

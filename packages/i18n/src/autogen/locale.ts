@@ -2453,6 +2453,10 @@ export interface Locale extends ILocale {
      */
     "descendingOrder": string;
     /**
+     * 全権限を付与
+     */
+    "withCredential": string;
+    /**
      * スクラッチパッド
      */
     "scratchpad": string;
@@ -2460,6 +2464,30 @@ export interface Locale extends ILocale {
      * スクラッチパッドは、AiScriptの実験環境を提供します。Misskeyと対話するコードの記述、実行、結果の確認ができます。
      */
     "scratchpadDescription": string;
+    /**
+     * 使用するライブラリ
+     */
+    "scratchpadSettings_lib": string;
+    /**
+     * ウィジェット（ボタン/AiScriptコンソール）
+     */
+    "scratchpadLibPreset_console": string;
+    /**
+     * ウィジェット（AiScript App）
+     */
+    "scratchpadLibPreset_app": string;
+    /**
+     * Misskey AiScript API
+     */
+    "scratchpadLib_mk": string;
+    /**
+     * UI API
+     */
+    "scratchpadLib_ui": string;
+    /**
+     * Play用定数（モック）
+     */
+    "scratchpadLib_play": string;
     /**
      * UIインスペクター
      */
@@ -3020,6 +3048,10 @@ export interface Locale extends ILocale {
      * このノートはすでにクリップ「{name}」に含まれています。ノートをこのクリップから除外しますか？
      */
     "confirmToUnclipAlreadyClippedNote": ParameterizedString<"name">;
+    /**
+     * Play
+     */
+    "flash": string;
     /**
      * パブリック
      */
