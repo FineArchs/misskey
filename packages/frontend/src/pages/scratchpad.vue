@@ -83,7 +83,7 @@ import MkAsUi from '@/components/MkAsUi.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import XEnv, { envDefault } from './scratchpad.settings.env.vue';
-import type { EnvSetting, LibKey } from './scratchpad.settings.env.vue';
+import type { EnvSetting, LibKey, LibsState } from './scratchpad.settings.env.vue';
 
 const parser = new Parser();
 let aiscript: Interpreter;
@@ -106,7 +106,9 @@ watch(code, () => {
 	miLocalStorage.setItem('scratchpad', code.value);
 });
 
-const libGetter: Record<LibKey, (env: EnvSetting) => Record<string, Value>> = {
+const libGetter: {
+	[key in LibKey]: (opts: LibsState[key]) => Record<string, Value>;
+} = {
 	mk({ withCredential }) {
 		return createAiScriptEnv({
 			storageKey: 'widget',
@@ -153,9 +155,10 @@ async function run() {
 	components.value = [];
 	uiKey.value++;
 	logs.value = [];
-	const libs = envSetting.value.libs.reduce((a, v) => (
-		{ ...a, ...libGetter[v](envSetting.value) }
-	), {});
+	let libs: Record<string, Value> = {};
+	for (const [key, state] of Object.entries(envSetting.value.libs)) {
+		if (state.use) Object.assign(libs, libGetter[key](state));
+	}
 	aiscript = new Interpreter(libs, {
 		in: aiScriptReadline,
 		out: (value) => {

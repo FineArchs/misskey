@@ -6,113 +6,151 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkRadios v-model="currentPreset">
 	<template #label>{{ i18n.ts.scratchpadSettings_lib }}</template>
-	<option v-for="[i, preset] in presetsOptions" :value="i">{{ preset.name }}</option>
+	<option v-for="[i, label] in presetsOptions" :value="i">{{ label }}</option>
 </MkRadios>
-<MkSwitch v-for="key in libKeys" v-model="currentLibsSwitches[key]">
-	<template #label>{{ libNames[key] }}</template>
+
+<MkSwitch v-model="current.value.libs.mk.use">
+	<template #label>{{ i18n.ts.scratchpadLib_mk }}</template>
 </MkSwitch>
-<MkSwitch v-if="currentLibsSwitches.mk" v-model="withCredential">
-	<template #label>{{ i18n.ts.withCredential }}</template>
+<div :class="$style.libOpts" v-if="current.value.libs.mk.use">
+	<MkSwitch v-model="current.value.libs.mk.withCredential">
+		<template #label>{{ i18n.ts.withCredential }}</template>
+	</MkSwitch>
+</div>
+<MkSwitch v-model="current.value.libs.ui.use">
+	<template #label>{{ i18n.ts.scratchpadLib_ui }}</template>
+</MkSwitch>
+<MkSwitch v-model="current.value.libs.play.use">
+	<template #label>{{ i18n.ts.scratchpadLib_play }}</template>
 </MkSwitch>
 </template>
 
 <script lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch, toRaw } from 'vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
+import { deepEqual } from '@/utility/deep-equal.js';
 
+const deleted = Symbol("objMap deleted");
+type deleted = typeof deleted;
+// キーと値の対応関係を維持できない
+function objMap<K extends string, V, V2>(
+	obj: Record<K, V>,
+	cb: (v: V, k: K) => V2,
+): Record<K, Exclude<V2, deleted>> {
+	return Object.fromEntries(
+		Object.entries(obj).map(
+			([k, v]) => [k, cb(v as V, k as K)]
+		).filter(([k, v]) => v !== deleted)
+	) as any;
+}
 
-const libKeys = ["mk", "ui", "play"] as const;
-export type LibKey = typeof libKeys[number];
+const libsDef = {
+	mk: {
+		state: {
+			use: true as boolean,
+			withCredential: false as boolean,
+		},
+	},
+	ui: {
+		state: {
+			use: true as boolean,
+		},
+	},
+	play: {
+		state: {
+			use: false as boolean,
+		},
+	},
+} as const satisfies Record<string, {
+	state: { use: boolean } & Record<string, any>;
+}>;
+
+const libKeys = Object.keys(libsDef);
+export type LibKey = keyof typeof libsDef;
+export type LibsState = {
+	[key in LibKey]: (typeof libsDef)[key]["state"];
+};
 export type EnvSetting = {
-	libs: LibKey[];
-	withCredential?: boolean;
+	libs: LibsState;
 };
+export const envDefault = {
+	libs: objMap(libsDef, v => v.state),
+} as EnvSetting;
 
-// i18nのインライン化を邪魔しないようにi18n.ts.[`scratchpadLib_${key}`]は使わない
-const libNames: Record<LibKey, any> = {
-	mk: i18n.ts.scratchpadLib_mk,
-	ui: i18n.ts.scratchpadLib_ui,
-	play: i18n.ts.scratchpadLib_play,
-};
 const presetsDef: {
 	name: string,
-	libs: LibKey[],
-	withCredential?: boolean,
+	libs: Partial<LibsState>,
 }[] = [
 	{
 		name: i18n.ts.default,
-		libs: ["mk", "ui"],
+		libs: objMap(envDefault.libs, v => v.use ? v : deleted) as any,
 	},
 	{
 		name: i18n.ts.flash,
-		libs: ["mk", "ui", "play"],
+		libs: {
+			mk: { use: true, withCredential: false },
+			ui: { use: true },
+			play: { use: true },
+		},
 	},
 	{
 		name: i18n.ts.scratchpadLibPreset_console,
-		libs: ["mk"],
-		withCredential: true,
+		libs: {
+			mk: { use: true, withCredential: true },
+		},
 	},
 	{
 		name: i18n.ts.scratchpadLibPreset_app,
-		libs: ["mk", "ui"],
-		withCredential: true,
+		libs: {
+			mk: { use: true, withCredential: true },
+			ui: { use: true },
+		},
 	},
 	{
 		name: i18n.ts.none,
-		libs: [],
+		libs: {},
 	},
 ];
-const presetsOptions: [number | null, {
-	name: typeof i18n["ts"][any],
-}][] = [
-	...presetsDef.entries(),
-	[null, { name: i18n.ts.custom }]
+const presetsOptions: (readonly [number | null, string])[] = [
+	...presetsDef.map((v, i) => [i, v.name] as const),
+	[null, i18n.ts.custom]
 ];
-
-export const envDefault = presetsDef[0];
 </script>
 
 <script lang="ts" setup>
-const current = defineModel<EnvSetting>({ required: true });
-const currentLibs = computed<LibKey[]>({
-	get() { return current.value.libs; },
-	set(newval) { current.value = { ...current.value, libs: newval }; }
-});
-const withCredential = computed<boolean>({
-	get() { return current.value.withCredential ?? false; },
-	set(newval) { current.value = { ...current.value, withCredential: newval }; }
-});
+const model = defineModel<EnvSetting>({ required: true });
+// optsの深度を可変にするためreactiveを使用
+const current = reactive({ value: model.value });
+// model->currentの反映は初回だけでいいためcurrent->modelのみ
+watch(current, () => model.value = toRaw(current.value));
 
-const currentLibsSwitches = reactive(Object.fromEntries(
-	libKeys.map(key => [key, computed<boolean>({
-		get() {
-			return currentLibs.value.includes(key);
-		},
-		set(newval) {
-			if (newval === currentLibs.value.includes(key)) return;
-			// 一応順序を維持する設計
-			currentLibs.value = libKeys.filter(k => {
-				if (k === key) return newval;
-				return currentLibs.value.includes(k);
-			});
-		},
-	})])
-));
 const currentPreset = computed<number | null>({
 	get() {
 		const idx = presetsDef.findIndex(preset =>
-			!!preset.withCredential === withCredential.value
-			&& libKeys.every(key =>
-				preset.libs.includes(key) === currentLibs.value.includes(key)
-			)
+			libKeys.every(key => {
+				const a = preset.libs[key];
+				const b = current.value.libs[key];
+				if (a == null) return !b.use;
+				return deepEqual(a, b);
+			})
 		);
 		return idx === -1 ? null : idx;
 	},
-	set(val) {
-		if (val == null) return;
-		current.value = presetsDef[val];
+	set(newval) {
+		if (newval == null) return;
+		for (const key of libKeys) {
+			const v = presetsDef[newval].libs[key];
+			if (v == null) current.value.libs[key].use = false;
+			else current.value.libs[key] = v;
+		}
 	}
 });
 </script>
+
+<style lang="scss" module>
+.libOpts {
+	padding: 16px;
+}
+</style>
