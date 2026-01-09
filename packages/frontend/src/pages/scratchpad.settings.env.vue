@@ -9,24 +9,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<option v-for="[i, label] in presetsOptions" :value="i">{{ label }}</option>
 </MkRadios>
 
-<MkSwitch v-model="current.value.libs.mk.use">
-	<template #label>{{ i18n.ts.scratchpadLib_mk }}</template>
-</MkSwitch>
-<div :class="$style.libOpts" v-if="current.value.libs.mk.use">
-	<MkSwitch v-model="current.value.libs.mk.withCredential">
-		<template #label>{{ i18n.ts.withCredential }}</template>
+<div :class="$style.libsContainer">
+	<MkSwitch v-model="model.libs.mk.use">
+		<template #label>{{ i18n.ts.scratchpadLib_mk }}</template>
+	</MkSwitch>
+	<div :class="$style.libOpts" v-if="model.libs.mk.use">
+		<MkSwitch v-model="model.libs.mk.withCredential">
+			<template #label>{{ i18n.ts.withCredential }}</template>
+		</MkSwitch>
+	</div>
+	<MkSwitch v-model="model.libs.ui.use">
+		<template #label>{{ i18n.ts.scratchpadLib_ui }}</template>
+	</MkSwitch>
+	<MkSwitch v-model="model.libs.play.use">
+		<template #label>{{ i18n.ts.scratchpadLib_play }}</template>
 	</MkSwitch>
 </div>
-<MkSwitch v-model="current.value.libs.ui.use">
-	<template #label>{{ i18n.ts.scratchpadLib_ui }}</template>
-</MkSwitch>
-<MkSwitch v-model="current.value.libs.play.use">
-	<template #label>{{ i18n.ts.scratchpadLib_play }}</template>
-</MkSwitch>
 </template>
 
 <script lang="ts">
-import { computed, reactive, watch, toRaw } from 'vue';
+import { computed, watch, triggerRef, toRaw } from 'vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
@@ -121,36 +123,40 @@ const presetsOptions: (readonly [number | null, string])[] = [
 
 <script lang="ts" setup>
 const model = defineModel<EnvSetting>({ required: true });
-// optsの深度を可変にするためreactiveを使用
-const current = reactive({ value: model.value });
-// model->currentの反映は初回だけでいいためcurrent->modelのみ
-watch(current, () => model.value = toRaw(current.value));
+// modelの各要素へのアクセスがmodelへのアクセスとみなされるようにする処置
+watch(model.value, () => triggerRef(model), { deep: true });
 
 const currentPreset = computed<number | null>({
 	get() {
 		const idx = presetsDef.findIndex(preset =>
 			libKeys.every(key => {
 				const a = preset.libs[key];
-				const b = current.value.libs[key];
+				const b = toRaw(model.value.libs[key]);
 				if (a == null) return !b.use;
 				return deepEqual(a, b);
 			})
 		);
 		return idx === -1 ? null : idx;
 	},
-	set(newval) {
-		if (newval == null) return;
+	set(presetId) {
+		if (presetId == null) return;
+		const assignee = model.value.libs;
 		for (const key of libKeys) {
-			const v = presetsDef[newval].libs[key];
-			if (v == null) current.value.libs[key].use = false;
-			else current.value.libs[key] = v;
+			const value = presetsDef[presetId].libs[key];
+			if (value == null) assignee[key].use = false;
+			else assignee[key] = structuredClone(value);
 		}
 	}
 });
 </script>
 
 <style lang="scss" module>
+.libsContainer {
+	display: grid;
+	gap: 4px;
+	padding-top: 8px;
+}
 .libOpts {
-	padding: 16px;
+	padding-left: 16px;
 }
 </style>
