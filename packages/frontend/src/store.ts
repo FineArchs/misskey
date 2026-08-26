@@ -182,7 +182,7 @@ export const store = markRaw(new Pizzax('base', {
 	},
 	reactions: {
 		where: 'account',
-		default: ['👍', '❤️', '⭐', '🤔', '😩', '㊗️', '🍮' , ':iihanashi:','🈂️',':kandou:', ':voskey_icon:' , ':takahashi_fankit:'],
+		default: ['👍', '❤️', '⭐', '🤔', '😩', '㊗️', '🍮', ':iihanashi:', '🈂️', ':kandou:', ':voskey_icon:', ':takahashi_fankit:'],
 	},
 	pinnedEmojis: {
 		where: 'account',
